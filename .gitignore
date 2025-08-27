@@ -1,0 +1,12 @@
+# Node.js
+node_modules/
+dist/
+build/
+
+# Turbo
+.turbo/
+turbo.log
+
+# Env
+.env
+.env.*

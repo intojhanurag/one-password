@@ -1,0 +1,21 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "ESNext",
+    "moduleResolution": "Node",
+    "strict": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "jsx": "preserve",
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./packages/*/src"],
+      "@ui/*": ["./packages/ui/src/*"],
+      "@config/*": ["./packages/config/*"],
+      "@utils/*": ["./packages/utils/src/*"]
+    }
+  }
+}

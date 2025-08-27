@@ -1,0 +1,8 @@
+{
+  "name": "api",
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "go run main.go",
+    "build": "go build -o dist/main main.go"
+  }
+}
