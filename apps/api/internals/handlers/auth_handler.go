@@ -61,3 +61,30 @@ func (h *AuthHandler) Signup(w http.ResponseWriter, r *http.Request) {
 		Token:    res.Token,
 	})
 }
+
+
+func (h *AuthHandler) Signin(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	var input services.SigninInput
+	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
+		http.Error(w, "invalid input", http.StatusBadRequest)
+		return
+	}
+
+	res, err := h.Service.Signin(h.Cfg.JWTSecret, h.Cfg.JWTExpiresMin, input)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusUnauthorized)
+		return
+	}
+
+	json.NewEncoder(w).Encode(map[string]interface{}{
+		"id":       res.User.ID,
+		"fullName": res.User.FullName,
+		"email":    res.User.Email,
+		"token":    res.Token,
+	})
+}

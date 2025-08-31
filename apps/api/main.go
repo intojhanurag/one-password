@@ -33,6 +33,7 @@ func main() {
 		fmt.Fprintln(w, "API is healthy 🚀")
 	})
 	mux.HandleFunc("/auth/signup", h.Signup)
+	mux.HandleFunc("/auth/login", h.Signin)   
 
 	addr := ":" + cfg.Port
 	fmt.Println("Starting server at", addr)

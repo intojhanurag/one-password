@@ -26,6 +26,17 @@ type SignupResult struct {
 	Token string
 }
 
+type SigninInput struct {
+	Email    string
+	Password string
+}
+
+type SigninResult struct {
+	User  *models.User
+	Token string
+}
+
+
 func NewAuthService(repo repository.UserRepository, db *gorm.DB, cost int) *AuthService {
 	return &AuthService{Repo: repo, DB: db, BCryptCost: cost}
 }
@@ -58,4 +69,34 @@ func (s *AuthService) Signup(secret string, jwtExpMin int, in SignupInput) (*Sig
 	}
 
 	return &SignupResult{User: user, Token: token}, nil
+}
+
+
+
+func (s *AuthService) Signin(secret string, jwtExpMin int, in SigninInput) (*SigninResult, error) {
+	if in.Email == "" || in.Password == "" {
+		return nil, errors.New("missing email or password")
+	}
+
+	// Find the user by email
+	user, err := s.Repo.FindByEmail(s.DB, in.Email)
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, errors.New("invalid email or password")
+		}
+		return nil, err
+	}
+
+	// Compare password with hash
+	if !utils.CheckPassword(user.PasswordHash,in.Password) {
+		return nil, errors.New("invalid email or password")
+	}
+
+	// Generate JWT
+	token, err := utils.GenerateJWT(secret, user.ID, jwtExpMin)
+	if err != nil {
+		return nil, err
+	}
+
+	return &SigninResult{User: user, Token: token}, nil
 }
