@@ -3,8 +3,8 @@ package handlers
 import (
     "encoding/json"
     "net/http"
-    "strconv"
     "github.com/intojhanurag/One-Password/apps/api/internals/services"
+    "github.com/intojhanurag/One-Password/apps/api/internals/middleware"
 )
 
 type APIKeyHandler struct {
@@ -23,7 +23,7 @@ func (h *APIKeyHandler) Create(w http.ResponseWriter, r *http.Request) {
 
     var req struct {
         Name string `json:"name"`
-        Key string `json:"key"` // plaintext key user types
+        Key string `json:"key"` 
         Description string `json:"description"`
         Tags string `json:"tags"`
     }
@@ -32,13 +32,13 @@ func (h *APIKeyHandler) Create(w http.ResponseWriter, r *http.Request) {
         return
     }
 
-    // Get user id from context (set by auth middleware)
-    uid := r.Context().Value("userID")
-    if uid == nil {
-        http.Error(w, "unauthorized", http.StatusUnauthorized)
-        return
-    }
-    ownerID := uid.(uint)
+    uid := r.Context().Value(middleware.UserIDKey)
+	if uid == nil {
+		http.Error(w, "unauthorized", http.StatusUnauthorized)
+		return
+	}
+	ownerID := uid.(uint)
+
 
     res, err := h.Service.Create(services.CreateAPIKeyInput{
         Name: req.Name,
@@ -52,14 +52,13 @@ func (h *APIKeyHandler) Create(w http.ResponseWriter, r *http.Request) {
         return
     }
 
-    // Return created metadata and the plaintext key once
     w.Header().Set("Content-Type", "application/json")
     json.NewEncoder(w).Encode(res)
 }
 
-// GET /apikeys  (list)
+
 func (h *APIKeyHandler) List(w http.ResponseWriter, r *http.Request) {
-    uid := r.Context().Value("userID")
+    uid := r.Context().Value(middleware.UserIDKey)
     if uid == nil {
         http.Error(w, "unauthorized", http.StatusUnauthorized)
         return
@@ -72,26 +71,32 @@ func (h *APIKeyHandler) List(w http.ResponseWriter, r *http.Request) {
         return
     }
 
-    // return only safe metadata
+  
     json.NewEncoder(w).Encode(keys)
 }
 
-// GET /apikeys/{id}/reveal  (dangerous: returns plaintext, require strong auth)
-func (h *APIKeyHandler) Reveal(w http.ResponseWriter, r *http.Request) {
-    // parse id from URL (if you use net/http, use strings.TrimPrefix or gorilla/mux)
-    idStr := r.URL.Path[len("/apikeys/"):] // naive; prefer a router
-    id, _ := strconv.Atoi(idStr)
 
-    uid := r.Context().Value("userID")
+func (h *APIKeyHandler) RevealByName(w http.ResponseWriter, r *http.Request) {
+    
+    name:=r.URL.Query().Get("name")
+
+    if name==""{
+        http.Error(w, "invalid input", http.StatusBadRequest)   
+        return
+    }
+
+    uid:=r.Context().Value(middleware.UserIDKey)
     if uid == nil {
         http.Error(w, "unauthorized", http.StatusUnauthorized)
         return
     }
-
-    plaintext, err := h.Service.GetDecrypted(uid.(uint), uint(id))
+    plaintext, err:=h.Service.GetByName(uid.(uint),name)
     if err != nil {
         http.Error(w, "not found or unauthorized", http.StatusNotFound)
         return
     }
-    json.NewEncoder(w).Encode(map[string]string{"key": plaintext})
+    json.NewEncoder(w).Encode(map[string]string{
+        "name": name,
+        "key": plaintext,
+    })
 }

@@ -78,7 +78,7 @@ func (s *AuthService) Signin(secret string, jwtExpMin int, in SigninInput) (*Sig
 		return nil, errors.New("missing email or password")
 	}
 
-	// Find the user by email
+	
 	user, err := s.Repo.FindByEmail(s.DB, in.Email)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -87,12 +87,12 @@ func (s *AuthService) Signin(secret string, jwtExpMin int, in SigninInput) (*Sig
 		return nil, err
 	}
 
-	// Compare password with hash
+	
 	if !utils.CheckPassword(user.PasswordHash,in.Password) {
 		return nil, errors.New("invalid email or password")
 	}
 
-	// Generate JWT
+	
 	token, err := utils.GenerateJWT(secret, user.ID, jwtExpMin)
 	if err != nil {
 		return nil, err

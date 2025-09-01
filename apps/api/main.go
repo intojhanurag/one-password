@@ -29,7 +29,7 @@ func main() {
 		log.Fatalf("auto-migrate failed: %v", err)
 	}
 
-	// Wire dependencies
+	
 	repo := repository.NewUserRepository()
 	service := services.NewAuthService(repo, db, cfg.BCryptCost)
 	h := handlers.NewAuthHandler(service, cfg)
@@ -49,6 +49,7 @@ func main() {
 	mux.HandleFunc("/auth/login", h.Signin)   
 	mux.HandleFunc("/apikeys", authMW(akHandler.Create))
 	mux.HandleFunc("/apikeys/list", authMW(akHandler.List))
+	mux.HandleFunc("/apikeys/reveal", authMW(akHandler.RevealByName))
 
 
 
