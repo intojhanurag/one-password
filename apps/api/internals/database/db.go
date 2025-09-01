@@ -12,5 +12,6 @@ func Connect(dsn string) *gorm.DB {
 	if err != nil {
 		log.Fatalf("failed to connect DB: %v", err)
 	}
+
 	return db
 }

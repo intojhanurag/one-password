@@ -4,7 +4,7 @@ import (
 	"log"
 	"os"
 	"strconv"
-
+	"encoding/base64"
 	"github.com/joho/godotenv"
 )
 
@@ -15,6 +15,7 @@ type Config struct {
 	JWTSecret     string
 	JWTExpiresMin int
 	BCryptCost    int
+	MasterKey     []byte
 }
 
 func Load() *Config {
@@ -26,6 +27,18 @@ func Load() *Config {
 	bcryptCost, err := strconv.Atoi(get("BCRYPT_COST", "12"))
 	if err != nil { bcryptCost = 12 }
 
+	masterKeyB64:=must("MASTER_KEY_B64")
+
+	keyBytes, err:=base64.StdEncoding.DecodeString(masterKeyB64)
+
+	if err!=nil {
+		log.Fatalf("invalid MASTER_KEY_B64: %v",err)
+	}
+
+	if len(keyBytes)!=32 {
+		log.Fatalf("MASTER_KEY_B64 must decode to 32 bytes,got %d",len(keyBytes))
+	}
+
 	return &Config{
 		AppEnv:        get("APP_ENV", "dev"),
 		Port:          get("PORT", "8080"),
@@ -33,6 +46,7 @@ func Load() *Config {
 		JWTSecret:     must("JWT_SECRET"),
 		JWTExpiresMin: jwtExp,
 		BCryptCost:    bcryptCost,
+		MasterKey: 	   keyBytes,
 	}
 }
 

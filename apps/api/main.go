@@ -8,6 +8,8 @@ import (
 	"github.com/intojhanurag/One-Password/apps/api/internals/config"
 	"github.com/intojhanurag/One-Password/apps/api/internals/database"
 	"github.com/intojhanurag/One-Password/apps/api/internals/handlers"
+	
+	"github.com/intojhanurag/One-Password/apps/api/internals/middleware"
 	"github.com/intojhanurag/One-Password/apps/api/internals/models"
 	"github.com/intojhanurag/One-Password/apps/api/internals/repository"
 	"github.com/intojhanurag/One-Password/apps/api/internals/services"
@@ -23,10 +25,21 @@ func main() {
 		log.Fatalf("auto-migrate failed: %v", err)
 	}
 
+	if err := db.AutoMigrate(&models.APIKey{}); err != nil {
+		log.Fatalf("auto-migrate failed: %v", err)
+	}
+
 	// Wire dependencies
 	repo := repository.NewUserRepository()
 	service := services.NewAuthService(repo, db, cfg.BCryptCost)
 	h := handlers.NewAuthHandler(service, cfg)
+
+	akRepo := repository.NewAPIKeyRepository()
+	akSvc := services.NewAPIKeyService(akRepo, db, cfg.MasterKey)
+	akHandler := handlers.NewAPIKeyHandler(akSvc)
+
+	
+	authMW := middleware.AuthMW([]byte(cfg.JWTSecret))
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
@@ -34,6 +47,10 @@ func main() {
 	})
 	mux.HandleFunc("/auth/signup", h.Signup)
 	mux.HandleFunc("/auth/login", h.Signin)   
+	mux.HandleFunc("/apikeys", authMW(akHandler.Create))
+	mux.HandleFunc("/apikeys/list", authMW(akHandler.List))
+
+
 
 	addr := ":" + cfg.Port
 	fmt.Println("Starting server at", addr)
