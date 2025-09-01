@@ -10,7 +10,7 @@ type APIKeyRepository interface {
     ListByOwner(db *gorm.DB, ownerID uint) ([]models.APIKey, error)
     GetByID(db *gorm.DB, ownerID, id uint) (*models.APIKey, error)
     FindByOwnerAndName(db *gorm.DB, ownerID uint, name string) (*models.APIKey, error) 
-    Delete(db *gorm.DB, ownerID, id uint) error
+    Delete(db *gorm.DB, ownerID uint, name string) error
 }
 
 type apiKeyRepo struct{}
@@ -41,6 +41,6 @@ func (r *apiKeyRepo) FindByOwnerAndName(db *gorm.DB, ownerID uint, name string) 
     return &key, err
 }
 
-func (r *apiKeyRepo) Delete(db *gorm.DB, ownerID, id uint) error {
-    return db.Where("owner_id = ? AND id = ?", ownerID, id).Delete(&models.APIKey{}).Error
+func (r *apiKeyRepo) Delete(db *gorm.DB, ownerID uint, name string) error {
+    return db.Where("owner_id = ? AND name = ?", ownerID, name).Delete(&models.APIKey{}).Error
 }

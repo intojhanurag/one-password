@@ -100,3 +100,25 @@ func (h *APIKeyHandler) RevealByName(w http.ResponseWriter, r *http.Request) {
         "key": plaintext,
     })
 }
+
+
+func (h *APIKeyHandler) Delete(w http.ResponseWriter, r *http.Request) {
+    name:=r.URL.Query().Get("name")
+    if name==""{
+        http.Error(w, "invalid input", http.StatusBadRequest)   
+        return
+    }
+    uid:=r.Context().Value(middleware.UserIDKey)
+    if uid == nil {
+        http.Error(w, "unauthorized", http.StatusUnauthorized)
+        return
+    }
+    err:=h.Service.DeleteByName(uid.(uint),name)
+    if err != nil {
+        http.Error(w, "not found or unauthorized", http.StatusNotFound)
+        return
+    }
+    json.NewEncoder(w).Encode(map[string]string{
+        "message": "key deleted",
+    })
+}

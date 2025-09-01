@@ -50,6 +50,7 @@ func main() {
 	mux.HandleFunc("/apikeys", authMW(akHandler.Create))
 	mux.HandleFunc("/apikeys/list", authMW(akHandler.List))
 	mux.HandleFunc("/apikeys/reveal", authMW(akHandler.RevealByName))
+	mux.HandleFunc("/apikeys/delete", authMW(akHandler.Delete))
 
 
 

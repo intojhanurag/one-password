@@ -87,6 +87,10 @@ func (s *APIKeyService) GetByName(ownerID uint, name string) (string, error) {
     return plaintext, err
 }
 
+func (s *APIKeyService) DeleteByName(ownerID uint, name string) error {
+    return s.Repo.Delete(s.DB, ownerID, name)
+}
+
 func (s *APIKeyService) GetDecrypted(ownerID, id uint) (string, error) {
     rec, err := s.Repo.GetByID(s.DB, ownerID, id)
     if err != nil {
