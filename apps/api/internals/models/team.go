@@ -10,4 +10,6 @@ type Team struct {
 	OwnerID     uint      `gorm:"not null;index"`
 	CreatedAt   time.Time
 	Owner 		User      `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;foreignKey:OwnerID;references:ID"`
+	APIKeys    []APIKey `gorm:"many2many:api_key_teams;" json:"apiKeys"`
+	
 }

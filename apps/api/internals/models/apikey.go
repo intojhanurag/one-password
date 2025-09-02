@@ -14,4 +14,6 @@ type APIKey struct {
     Tags       string    `gorm:"size:255" json:"tags,omitempty"` // comma-separated or separate table
     CreatedAt  time.Time `json:"createdAt"`
     UpdatedAt  time.Time `json:"updatedAt"`
+    Teams      []Team `gorm:"many2many:api_key_teams;" json:"teams"`
+    
 }
