@@ -28,6 +28,9 @@ func main() {
 	if err := db.AutoMigrate(&models.APIKey{}); err != nil {
 		log.Fatalf("auto-migrate failed: %v", err)
 	}
+	if err := db.AutoMigrate(&models.Team{}); err != nil {
+		log.Fatalf("auto-migrate failed: %v", err)
+	}
 
 	
 	repo := repository.NewUserRepository()
@@ -37,6 +40,12 @@ func main() {
 	akRepo := repository.NewAPIKeyRepository()
 	akSvc := services.NewAPIKeyService(akRepo, db, cfg.MasterKey)
 	akHandler := handlers.NewAPIKeyHandler(akSvc)
+
+	
+	teamRepo := repository.NewTeamRepository()
+	teamSvc := services.NewTeamService(teamRepo, db)
+	teamHandler := handlers.NewTeamHandler(teamSvc)
+
 
 	
 	authMW := middleware.AuthMW([]byte(cfg.JWTSecret))
@@ -51,6 +60,7 @@ func main() {
 	mux.HandleFunc("/apikeys/list", authMW(akHandler.List))
 	mux.HandleFunc("/apikeys/reveal", authMW(akHandler.RevealByName))
 	mux.HandleFunc("/apikeys/delete", authMW(akHandler.Delete))
+	mux.HandleFunc("/teams", authMW(teamHandler.Create))
 
 
 
