@@ -42,9 +42,14 @@ func main() {
 	akSvc := services.NewAPIKeyService(akRepo, db, cfg.MasterKey)
 	akHandler := handlers.NewAPIKeyHandler(akSvc)
 
+	// // TeamMembership
+	teamMembershipRepo := repository.NewTeamMembershipRepository(db)
+	teamMembershipSvc := services.NewTeamMembershipService(teamMembershipRepo)
+	teamMembershipHandler := handlers.NewTeamMembershipHandler(teamMembershipSvc)
+
 	
 	teamRepo := repository.NewTeamRepository()
-	teamSvc := services.NewTeamService(teamRepo, db)
+	teamSvc := services.NewTeamService(teamRepo,teamMembershipRepo,db)
 	teamHandler := handlers.NewTeamHandler(teamSvc)
 
 	// Membership
@@ -52,16 +57,10 @@ func main() {
 	membershipSvc := services.NewMembershipService(membershipRepo, db)
 	membershipHandler := handlers.NewMembershipHandler(membershipSvc)
 
-	// // TeamMembership
-	// teamMembershipRepo := repository.NewTeamMembershipRepository()
-	// teamMembershipSvc := services.NewTeamMembershipService(teamMembershipRepo, db)
-	// teamMembershipHandler := handlers.NewTeamMembershipHandler(teamMembershipSvc)
-
-
 	// //apikey-team relationship
-	// aktmRepo := repository.NewAPIKeyTeamRepository()
-	// aktmSvc := services.NewAPIKeyTeamService(aktmRepo, db)
-	// aktmHandler := handlers.NewAPIKeyTeamHandler(aktmSvc)
+	aktmRepo := repository.NewAPIKeyTeamRepository(db)
+	aktmSvc := services.NewAPIKeyTeamService(aktmRepo)
+	aktmHandler := handlers.NewAPIKeyTeamHandler(aktmSvc)
 
 
 	
@@ -96,18 +95,16 @@ func main() {
 
 	// Team Membership
 	//it will basically tell us which user is member of which team
-	// mux.HandleFunc("/team-memberships", authMW(teamMembershipHandler.Create))
-	// mux.HandleFunc("/team-memberships/list", authMW(teamMembershipHandler.List))
-	// mux.HandleFunc("/team-memberships/delete", authMW(teamMembershipHandler.Delete))
+	mux.HandleFunc("/team-memberships", authMW(teamMembershipHandler.Create))
+	mux.HandleFunc("/team-memberships/list", authMW(teamMembershipHandler.List))
+	mux.HandleFunc("/team-memberships/delete", authMW(teamMembershipHandler.Delete))
 
 	// APIKey-Team relationship
 	// it is basically tell us to which team can access which api_key
 	// id , team_id, apikey_id
-	// mux.HandleFunc("/apikey-teams", authMW(akTeamHandler.Attach))   // e.g. attach APIKey to a Team
-	// mux.HandleFunc("/apikey-teams/list", authMW(akTeamHandler.List))
-	// mux.HandleFunc("/apikey-teams/delete", authMW(akTeamHandler.Detach))
-
-
+	mux.HandleFunc("/apikey-teams", authMW(aktmHandler.Attach))   // e.g. attach APIKey to a Team
+	mux.HandleFunc("/apikey-teams/list", authMW(aktmHandler.List))
+	mux.HandleFunc("/apikey-teams/delete", authMW(aktmHandler.Detach))
 
 	addr := ":" + cfg.Port
 	fmt.Println("Starting server at", addr)

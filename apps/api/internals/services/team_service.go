@@ -8,8 +8,9 @@ import (
 )
 
 type TeamService struct {
-	Repo repository.TeamRepository
-	DB   *gorm.DB
+	Repo            repository.TeamRepository
+	MembershipRepo  repository.TeamMembershipRepository
+	DB              *gorm.DB
 }
 
 type CreateTeamInput struct {
@@ -24,8 +25,8 @@ type CreateTeamResult struct {
 	Description string `json:"description"`
 }
 
-func NewTeamService(repo repository.TeamRepository, db *gorm.DB) *TeamService {
-	return &TeamService{Repo: repo, DB: db}
+func NewTeamService(repo repository.TeamRepository,membershipRepo repository.TeamMembershipRepository, db *gorm.DB) *TeamService {
+	return &TeamService{Repo: repo,MembershipRepo: membershipRepo, DB: db}
 }
 
 func (s *TeamService) Create(in CreateTeamInput) (*CreateTeamResult, error) {
@@ -39,6 +40,16 @@ func (s *TeamService) Create(in CreateTeamInput) (*CreateTeamResult, error) {
 		OwnerID:     in.OwnerID,
 	}
 	if err := s.Repo.Create(s.DB, t); err != nil {
+		return nil, err
+	}
+
+	membership:= models.TeamMembership{
+		TeamID: t.ID,
+		UserID: in.OwnerID,
+		Role: "owner",
+	}
+
+	if err := s.MembershipRepo.Create(&membership); err != nil {
 		return nil, err
 	}
 	return &CreateTeamResult{ID: t.ID, Name: t.Name, Description: t.Description}, nil
