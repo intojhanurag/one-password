@@ -20,8 +20,7 @@ func main() {
 
 	db := database.Connect(cfg.DatabaseURL)
 
-	// Auto-migrate models
-	// Auto-migrate all models
+	
 	if err := db.AutoMigrate(
 		&models.User{},
 		&models.APIKey{},
@@ -49,20 +48,20 @@ func main() {
 	teamHandler := handlers.NewTeamHandler(teamSvc)
 
 	// Membership
-	membershipRepo := repository.NewMembershipRepository()
+	membershipRepo := repository.NewMembershipRepository(db)
 	membershipSvc := services.NewMembershipService(membershipRepo, db)
 	membershipHandler := handlers.NewMembershipHandler(membershipSvc)
 
-	// TeamMembership
-	tmRepo := repository.NewTeamMembershipRepository()
-	tmSvc := services.NewTeamMembershipService(tmRepo, db)
-	tmHandler := handlers.NewTeamMembershipHandler(tmSvc)
+	// // TeamMembership
+	// teamMembershipRepo := repository.NewTeamMembershipRepository()
+	// teamMembershipSvc := services.NewTeamMembershipService(teamMembershipRepo, db)
+	// teamMembershipHandler := handlers.NewTeamMembershipHandler(teamMembershipSvc)
 
 
-	//apikey-team relationship
-	aktmRepo := repository.NewAPIKeyTeamRepository()
-	aktmSvc := services.NewAPIKeyTeamService(aktmRepo, db)
-	aktmHandler := handlers.NewAPIKeyTeamHandler(aktmSvc)
+	// //apikey-team relationship
+	// aktmRepo := repository.NewAPIKeyTeamRepository()
+	// aktmSvc := services.NewAPIKeyTeamService(aktmRepo, db)
+	// aktmHandler := handlers.NewAPIKeyTeamHandler(aktmSvc)
 
 
 	
@@ -77,23 +76,36 @@ func main() {
 	mux.HandleFunc("/auth/login", h.Signin)   
 
 	// APIKey
+	// when a user will add a new api_key
 	mux.HandleFunc("/apikeys", authMW(akHandler.Create))
 	mux.HandleFunc("/apikeys/list", authMW(akHandler.List))
 	mux.HandleFunc("/apikeys/reveal", authMW(akHandler.RevealByName))
 	mux.HandleFunc("/apikeys/delete", authMW(akHandler.Delete))
 
 	//Teams
+	// when a user create a team
+	// then team_id, owner_id
 	mux.HandleFunc("/teams", authMW(teamHandler.Create))
 
 	// Team Membership
-	mux.HandleFunc("/team-memberships", authMW(tmHandler.Create))
-	mux.HandleFunc("/team-memberships/list", authMW(tmHandler.List))
-	mux.HandleFunc("/team-memberships/delete", authMW(tmHandler.Delete))
+	//it will basically tell us which use bought our membership
+	// user_id, status(default active)
+	mux.HandleFunc("/memberships", authMW(membershipHandler.Create))
+	mux.HandleFunc("/memberships/delete", authMW(membershipHandler.Delete))
+
+
+	// Team Membership
+	//it will basically tell us which user is member of which team
+	// mux.HandleFunc("/team-memberships", authMW(teamMembershipHandler.Create))
+	// mux.HandleFunc("/team-memberships/list", authMW(teamMembershipHandler.List))
+	// mux.HandleFunc("/team-memberships/delete", authMW(teamMembershipHandler.Delete))
 
 	// APIKey-Team relationship
-	mux.HandleFunc("/apikey-teams", authMW(akTeamHandler.Attach))   // e.g. attach APIKey to a Team
-	mux.HandleFunc("/apikey-teams/list", authMW(akTeamHandler.List))
-	mux.HandleFunc("/apikey-teams/delete", authMW(akTeamHandler.Detach))
+	// it is basically tell us to which team can access which api_key
+	// id , team_id, apikey_id
+	// mux.HandleFunc("/apikey-teams", authMW(akTeamHandler.Attach))   // e.g. attach APIKey to a Team
+	// mux.HandleFunc("/apikey-teams/list", authMW(akTeamHandler.List))
+	// mux.HandleFunc("/apikey-teams/delete", authMW(akTeamHandler.Detach))
 
 
 

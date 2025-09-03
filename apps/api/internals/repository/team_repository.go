@@ -16,3 +16,6 @@ func NewTeamRepository() TeamRepository { return &teamRepo{} }
 func (r *teamRepo) Create(db *gorm.DB, t *models.Team) error {
 	return db.Create(t).Error
 }
+
+
+
