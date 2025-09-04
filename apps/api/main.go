@@ -28,6 +28,7 @@ func main() {
 		&models.Membership{},
 		&models.TeamMembership{},
 		&models.APIKeyTeam{},
+		&models.Activity{},
 	); err != nil {
 		log.Fatalf("auto-migrate failed: %v", err)
 	}
@@ -39,6 +40,7 @@ func main() {
 	h := handlers.NewAuthHandler(service, cfg)
 
 	akRepo := repository.NewAPIKeyRepository()
+	activityRepo := repository.NewActivityRepository()
 	akSvc := services.NewAPIKeyService(akRepo, db, cfg.MasterKey)
 	akHandler := handlers.NewAPIKeyHandler(akSvc)
 
@@ -62,6 +64,10 @@ func main() {
 	aktmSvc := services.NewAPIKeyTeamService(aktmRepo)
 	aktmHandler := handlers.NewAPIKeyTeamHandler(aktmSvc)
 
+	// Dashboard
+	dashboardSvc := services.NewDashboardService(db, akRepo, teamRepo, activityRepo)
+	dashboardHandler := handlers.NewDashboardHandler(dashboardSvc)
+
 
 	
 	authMW := middleware.AuthMW([]byte(cfg.JWTSecret))
@@ -80,6 +86,9 @@ func main() {
 	mux.HandleFunc("/apikeys/list", authMW(akHandler.List))
 	mux.HandleFunc("/apikeys/reveal", authMW(akHandler.RevealByName))
 	mux.HandleFunc("/apikeys/delete", authMW(akHandler.Delete))
+
+	// Dashboard
+	mux.HandleFunc("/dashboard", authMW(dashboardHandler.Get))
 
 	//Teams
 	// when a user create a team
@@ -105,6 +114,7 @@ func main() {
 	mux.HandleFunc("/apikey-teams", authMW(aktmHandler.Attach))   // e.g. attach APIKey to a Team
 	mux.HandleFunc("/apikey-teams/list", authMW(aktmHandler.List))
 	mux.HandleFunc("/apikey-teams/delete", authMW(aktmHandler.Detach))
+
 
 	addr := ":" + cfg.Port
 	fmt.Println("Starting server at", addr)
