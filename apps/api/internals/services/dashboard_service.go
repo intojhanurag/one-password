@@ -69,3 +69,57 @@ func (s *DashboardService) GetDashboard(userID uint) (*DashboardData, error) {
         RecentlyUsedKeys:  usedKeys,
     }, nil
 }
+
+
+// services/dashboard_service.go
+func (s *DashboardService) GetTeamDashboard(userID uint) (map[string]interface{}, error) {
+    // Total Teams (where user is a member)
+    var totalTeams int64
+    if err := s.db.Model(&models.TeamMembership{}).
+        Where("user_id = ?", userID).
+        Count(&totalTeams).Error; err != nil {
+        return nil, err
+    }
+    
+    // Teams Owned
+    var teamsOwned []models.Team
+    if err := s.db.Where("owner_id = ?", userID).Find(&teamsOwned).Error; err != nil {
+        return nil, err
+    }
+    teamsOwnedCount := len(teamsOwned)
+
+    // Total Members across all owned teams
+    var totalMembers int64
+    if err := s.db.Model(&models.TeamMembership{}).
+        Where("team_id IN (?)", s.db.Model(&models.Team{}).Select("id").Where("owner_id = ?", userID)).
+        Count(&totalMembers).Error; err != nil {
+        return nil, err
+    }
+
+    // Shared Keys (API keys that belong to teams the user owns)
+    var sharedKeys int64
+    if err := s.db.Model(&models.APIKeyTeam{}).
+        Where("team_id IN (?)", s.db.Model(&models.Team{}).Select("id").Where("owner_id = ?", userID)).
+        Count(&sharedKeys).Error; err != nil {
+        return nil, err
+    }
+
+    // Prepare teams data
+    teamsOwnedData := []map[string]interface{}{}
+    for _, team := range teamsOwned {
+        teamsOwnedData = append(teamsOwnedData, map[string]interface{}{
+            "id":          team.ID,
+            "name":        team.Name,
+            "description": team.Description,
+            "createdAt":   team.CreatedAt,
+        })
+    }
+
+    return map[string]interface{}{
+        "totalTeams":     totalTeams,
+        "teamsOwnedCount": teamsOwnedCount,
+        "totalMembers":   totalMembers,
+        "sharedKeys":     sharedKeys,
+        "teamsOwned":     teamsOwnedData,
+    }, nil
+}

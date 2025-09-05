@@ -89,6 +89,7 @@ func main() {
 
 	// Dashboard
 	mux.HandleFunc("/dashboard", authMW(dashboardHandler.Get))
+	mux.HandleFunc("/dashboard/teams",authMW(dashboardHandler.GetTeamsDashboard))
 
 	//Teams
 	// when a user create a team
