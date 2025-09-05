@@ -40,13 +40,12 @@ func main() {
 	h := handlers.NewAuthHandler(service, cfg)
 
 	akRepo := repository.NewAPIKeyRepository()
-	activityRepo := repository.NewActivityRepository()
 	akSvc := services.NewAPIKeyService(akRepo, db, cfg.MasterKey)
 	akHandler := handlers.NewAPIKeyHandler(akSvc)
 
 	// // TeamMembership
 	teamMembershipRepo := repository.NewTeamMembershipRepository(db)
-	teamMembershipSvc := services.NewTeamMembershipService(teamMembershipRepo)
+	teamMembershipSvc := services.NewTeamMembershipService(teamMembershipRepo,db)
 	teamMembershipHandler := handlers.NewTeamMembershipHandler(teamMembershipSvc)
 
 	
@@ -64,9 +63,17 @@ func main() {
 	aktmSvc := services.NewAPIKeyTeamService(aktmRepo)
 	aktmHandler := handlers.NewAPIKeyTeamHandler(aktmSvc)
 
+	activityRepo := repository.NewActivityRepository(db)
+
 	// Dashboard
-	dashboardSvc := services.NewDashboardService(db, akRepo, teamRepo, activityRepo)
+	dashboardSvc := services.NewDashboardService(db, akRepo, teamRepo, *activityRepo)
 	dashboardHandler := handlers.NewDashboardHandler(dashboardSvc)
+
+	
+	// activitySvc := services.NewActivityService(activityRepo)
+	activityHandler := handlers.NewActivityHandler(activityRepo)
+
+	
 
 
 	
@@ -90,6 +97,10 @@ func main() {
 	// Dashboard
 	mux.HandleFunc("/dashboard", authMW(dashboardHandler.Get))
 	mux.HandleFunc("/dashboard/teams",authMW(dashboardHandler.GetTeamsDashboard))
+
+	mux.HandleFunc("/dashboard/activity", authMW(activityHandler.ListActivities))
+	mux.HandleFunc("/dashboard/activity/detail", authMW(activityHandler.GetActivityStats))
+
 
 	//Teams
 	// when a user create a team

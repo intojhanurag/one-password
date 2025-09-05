@@ -1,8 +1,11 @@
 package services
 
 import (
+	"strconv"
+	"fmt"
 	"github.com/intojhanurag/One-Password/apps/api/internals/models"
 	"github.com/intojhanurag/One-Password/apps/api/internals/repository"
+	"gorm.io/gorm"
 )
 
 type TeamMembershipService interface {
@@ -10,13 +13,15 @@ type TeamMembershipService interface {
 	GetTeamMemberships(teamID uint) ([]models.TeamMembership, error)
 	GetUserMemberships(userID uint) ([]models.TeamMembership, error)
 	RemoveUserFromTeam(teamID, userID uint) error
+	
 }
 
 type teamMembershipService struct {
 	repo repository.TeamMembershipRepository
+	DB   *gorm.DB
 }
 
-func NewTeamMembershipService(repo repository.TeamMembershipRepository) TeamMembershipService {
+func NewTeamMembershipService(repo repository.TeamMembershipRepository, DB   *gorm.DB) TeamMembershipService {
 	return &teamMembershipService{repo: repo}
 }
 
@@ -26,6 +31,20 @@ func (s *teamMembershipService) AddUserToTeam(teamID, userID uint, role string) 
 		UserID: userID,
 		Role:   role,
 	}
+
+	// Then log the activity
+	activity := &models.Activity{
+		UserID:   userID,
+		Type:     "member_added",
+		Entity:   "team",
+		EntityID: teamID,
+		Message:  "Member added: " + strconv.Itoa(int(userID)),
+	}
+
+	if err := s.DB.Create(activity).Error; err != nil {
+		fmt.Printf("failed to log activity: %v\n", err)
+	}
+
 	return s.repo.Create(m)
 }
 

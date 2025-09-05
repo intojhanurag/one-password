@@ -52,5 +52,14 @@ func (s *TeamService) Create(in CreateTeamInput) (*CreateTeamResult, error) {
 	if err := s.MembershipRepo.Create(&membership); err != nil {
 		return nil, err
 	}
+
+	activity:= &models.Activity{
+		UserID: in.OwnerID,
+		Type: "team_created",
+		EntityID: t.ID,
+		Message: "Team created: "+ t.Name,
+	}
+
+	s.DB.Create(activity)
 	return &CreateTeamResult{ID: t.ID, Name: t.Name, Description: t.Description}, nil
 }

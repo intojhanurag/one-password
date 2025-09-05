@@ -2,6 +2,7 @@ package services
 
 import (
     "errors"
+    "fmt"
     "github.com/intojhanurag/One-Password/apps/api/internals/models"
     "github.com/intojhanurag/One-Password/apps/api/internals/repository"
     "github.com/intojhanurag/One-Password/apps/api/internals/utils"
@@ -58,6 +59,17 @@ func (s *APIKeyService) Create(in CreateAPIKeyInput) (*CreateAPIKeyResult, error
         return nil, err
     }
 
+    activity:= &models.Activity{
+        UserID: in.OwnerID,
+        Type: "apikey_created",
+        Entity: "apikey",
+        EntityID: k.ID,
+        Message: "API key created: " + k.Name,
+    }
+
+    s.DB.Create(activity)
+
+
     return &CreateAPIKeyResult{
         ID: k.ID,
         Name: k.Name,
@@ -73,22 +85,49 @@ func (s *APIKeyService) List(ownerID uint) ([]models.APIKey, error) {
 }
 
 func (s *APIKeyService) GetByName(ownerID uint, name string) (string, error) {
-    key,err:=s.Repo.FindByOwnerAndName(s.DB, ownerID, name) 
-
+    key, err := s.Repo.FindByOwnerAndName(s.DB, ownerID, name) 
     if err != nil {
         return "", err
     }
 
-    plaintext,err:=utils.DecryptAPIKey(s.MasterKey, key.Ciphertext, key.Nonce)
-
-    if err!=nil {
-        return "",err
+    plaintext, err := utils.DecryptAPIKey(s.MasterKey, key.Ciphertext, key.Nonce)
+    if err != nil {
+        return "", err
     }
-    return plaintext, err
+
+    // Log activity
+    activity := &models.Activity{
+        UserID:   ownerID,
+        Type:     "apikey_revealed",
+        Entity:   "apikey",
+        EntityID: key.ID,
+        Message:  "API key revealed: " + name,
+    }
+
+    if err := s.DB.Create(activity).Error; err != nil {
+        fmt.Printf("failed to log activity: %v\n", err)
+    }
+
+    return plaintext, nil
 }
 
 func (s *APIKeyService) DeleteByName(ownerID uint, name string) error {
-    return s.Repo.Delete(s.DB, ownerID, name)
+    err:= s.Repo.Delete(s.DB, ownerID, name)
+
+    if err!=nil {
+        return err
+    }
+
+    activity := &models.Activity{
+        UserID: ownerID,
+        Type: "apikey_deleted",
+        Entity: "apikey",
+        Message: "API key deleted" + name,
+    }  
+    if err := s.DB.Create(activity).Error; err != nil {
+        fmt.Printf("failed to log activity: %v\n", err)
+    }
+    return nil
 }
 
 func (s *APIKeyService) GetDecrypted(ownerID, id uint) (string, error) {

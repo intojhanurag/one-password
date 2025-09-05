@@ -7,42 +7,80 @@ import (
 	"gorm.io/gorm"
 )
 
-type ActivityRepository interface {
-	Create(db *gorm.DB, a *models.Activity) error
-	RecentByUser(db *gorm.DB, userID uint, limit int) ([]models.Activity, error)
-	CountThisWeekByUser(db *gorm.DB, userID uint) (int64, error)
+type ActivityRepository struct {
+	db *gorm.DB
 }
 
-type activityRepo struct{}
-
-func NewActivityRepository() ActivityRepository { return &activityRepo{} }
-
-func (r *activityRepo) Create(db *gorm.DB, a *models.Activity) error {
-	return db.Create(a).Error
+type ActivityRepositoryInterface interface {
+	Create(activity *models.Activity) error
+	List(limit, offset int) ([]models.Activity, error)
+	GetByID(id string) (*models.Activity, error)
+	CountAll() (int64, error)
+	CountToday() (int64, error)
+	CountUniqueUsers() (int64, error)
+	CountSecurityEvents() (int64, error)
 }
 
-func (r *activityRepo) RecentByUser(db *gorm.DB, userID uint, limit int) ([]models.Activity, error) {
-	var list []models.Activity
-	if limit <= 0 { limit = 5 }
-	err := db.Where("user_id = ?", userID).
+func NewActivityRepository(db *gorm.DB) *ActivityRepository{
+	return &ActivityRepository{db: db}
+}
+
+// Save new activity
+func (r *ActivityRepository) Create(activity *models.Activity) error {
+	return r.db.Create(activity).Error
+}
+
+// List activities with pagination
+func (r *ActivityRepository) List(limit, offset int) ([]models.Activity, error) {
+	var activities []models.Activity
+	err := r.db.
 		Order("created_at DESC").
 		Limit(limit).
-		Find(&list).Error
-	return list, err
+		Offset(offset).
+		Find(&activities).Error
+	return activities, err
 }
 
-func (r *activityRepo) CountThisWeekByUser(db *gorm.DB, userID uint) (int64, error) {
+// Get activity by ID
+func (r *ActivityRepository) GetByID(id string) (*models.Activity, error) {
+	var activity models.Activity
+	if err := r.db.First(&activity, "id = ?", id).Error; err != nil {
+		return nil, err
+	}
+	return &activity, nil
+}
+
+// Count all activities
+func (r *ActivityRepository) CountAll() (int64, error) {
 	var count int64
-	startOfWeek := startOfCurrentWeek()
-	err := db.Model(&models.Activity{}).
-		Where("user_id = ? AND created_at >= ?", userID, startOfWeek).
+	err := r.db.Model(&models.Activity{}).Count(&count).Error
+	return count, err
+}
+
+// Count today’s activities
+func (r *ActivityRepository) CountToday() (int64, error) {
+	var count int64
+	startOfDay := time.Now().Truncate(24 * time.Hour)
+	err := r.db.Model(&models.Activity{}).
+		Where("created_at >= ?", startOfDay).
 		Count(&count).Error
 	return count, err
 }
 
-func startOfCurrentWeek() time.Time {
-	now := time.Now()
-	offset := (int(now.Weekday()) + 6) % 7 // Monday as start of week
-	start := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, now.Location())
-	return start.AddDate(0, 0, -offset)
+// Count unique active users
+func (r *ActivityRepository) CountUniqueUsers() (int64, error) {
+	var count int64
+	err := r.db.Model(&models.Activity{}).
+		Select("COUNT(DISTINCT user_id)").
+		Count(&count).Error
+	return count, err
+}
+
+// Count security-related events (example: reveal/delete)
+func (r *ActivityRepository) CountSecurityEvents() (int64, error) {
+	var count int64
+	err := r.db.Model(&models.Activity{}).
+		Where("action IN ?", []string{"apikey.reveal", "apikey.delete"}).
+		Count(&count).Error
+	return count, err
 }
