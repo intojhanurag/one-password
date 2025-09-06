@@ -1,52 +1,30 @@
+"use client"
+
 import { redirect } from "next/navigation"
-import { createClient } from "@/lib/supabase/server"
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 import { KeyRound, Users, Shield, Activity, TrendingUp, Clock } from "lucide-react"
 
 export default async function DashboardPage() {
-  const supabase = await createClient()
 
-  const { data, error } = await supabase.auth.getUser()
-  if (error || !data?.user) {
-    redirect("/auth/login")
-  }
+  const router = useRouter();
 
-  // Get user profile
-  const { data: profile } = await supabase.from("profiles").select("*").eq("id", data.user.id).single()
-
-  // Get dashboard stats
-  const [{ count: apiKeysCount }, { count: teamsCount }, { count: recentActivityCount }] = await Promise.all([
-    supabase.from("api_keys").select("*", { count: "exact", head: true }).eq("user_id", data.user.id),
-    supabase.from("team_members").select("*", { count: "exact", head: true }).eq("user_id", data.user.id),
-    supabase
-      .from("audit_logs")
-      .select("*", { count: "exact", head: true })
-      .eq("user_id", data.user.id)
-      .gte("created_at", new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString()),
-  ])
-
-  // Get recent API keys
-  const { data: recentKeys } = await supabase
-    .from("api_keys")
-    .select("id, name, service, created_at, is_active")
-    .eq("user_id", data.user.id)
-    .order("created_at", { ascending: false })
-    .limit(5)
-
-  // Get recent activity
-  const { data: recentActivity } = await supabase
-    .from("audit_logs")
-    .select("action, resource_type, details, created_at")
-    .eq("user_id", data.user.id)
-    .order("created_at", { ascending: false })
-    .limit(5)
-
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      router.push("/login"); // redirect to login if no token
+    }
+  }, [router]);
+  
   return (
+
     <div className="space-y-8">
       {/* Header */}
       <div>
         <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-          Welcome back, {profile?.full_name || data.user.email?.split("@")[0]}
+          Welcome back, 
         </h1>
         <p className="text-gray-600 dark:text-gray-400 mt-2">Here's what's happening with your API keys and teams</p>
       </div>
@@ -59,9 +37,9 @@ export default async function DashboardPage() {
             <KeyRound className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{apiKeysCount || 0}</div>
+            <div className="text-2xl font-bold"></div>
             <p className="text-xs text-muted-foreground">
-              {apiKeysCount === 0 ? "No keys stored yet" : "Total stored keys"}
+              "No keys stored yet"
             </p>
           </CardContent>
         </Card>
@@ -72,9 +50,9 @@ export default async function DashboardPage() {
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{teamsCount || 0}</div>
+           
             <p className="text-xs text-muted-foreground">
-              {teamsCount === 0 ? "No teams joined" : "Teams you're part of"}
+              "No teams joined"
             </p>
           </CardContent>
         </Card>
@@ -96,7 +74,6 @@ export default async function DashboardPage() {
             <Activity className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{recentActivityCount || 0}</div>
             <p className="text-xs text-muted-foreground">Actions this week</p>
           </CardContent>
         </Card>

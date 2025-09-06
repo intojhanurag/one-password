@@ -22,7 +22,7 @@ type teamMembershipService struct {
 }
 
 func NewTeamMembershipService(repo repository.TeamMembershipRepository, DB   *gorm.DB) TeamMembershipService {
-	return &teamMembershipService{repo: repo}
+	return &teamMembershipService{repo: repo, DB: DB}
 }
 
 func (s *teamMembershipService) AddUserToTeam(teamID, userID uint, role string) error {

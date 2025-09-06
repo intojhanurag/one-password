@@ -2,7 +2,6 @@
 
 import type React from "react"
 
-import { createClient } from "@/lib/supabase/client"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -22,44 +21,7 @@ export default function SignUpPage() {
   const [isLoading, setIsLoading] = useState(false)
   const router = useRouter()
 
-  const handleSignUp = async (e: React.FormEvent) => {
-    e.preventDefault()
-    const supabase = createClient()
-    setIsLoading(true)
-    setError(null)
-
-    if (password !== confirmPassword) {
-      setError("Passwords do not match")
-      setIsLoading(false)
-      return
-    }
-
-    if (password.length < 6) {
-      setError("Password must be at least 6 characters long")
-      setIsLoading(false)
-      return
-    }
-
-    try {
-      const { error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          emailRedirectTo: process.env.NEXT_PUBLIC_DEV_SUPABASE_REDIRECT_URL || `${window.location.origin}/dashboard`,
-          data: {
-            full_name: fullName,
-          },
-        },
-      })
-      if (error) throw error
-      router.push("/auth/verify-email")
-    } catch (error: unknown) {
-      setError(error instanceof Error ? error.message : "An error occurred")
-    } finally {
-      setIsLoading(false)
-    }
-  }
-
+  
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 p-4">
       <div className="w-full max-w-md">
@@ -79,7 +41,45 @@ export default function SignUpPage() {
             <CardDescription>Sign up to start managing your API keys securely</CardDescription>
           </CardHeader>
           <CardContent>
-            <form onSubmit={handleSignUp} className="space-y-4">
+            <form  
+                className="space-y-4"
+                onSubmit={async(e)=>{
+                    e.preventDefault();
+                    setError(null);
+                    setIsLoading(true);
+
+                    if(password !== confirmPassword){
+                        setError("password do not match")
+                        setIsLoading(false);
+                        return;
+                    }
+                    try {
+                        const res = await fetch("http://localhost:5000/auth/signup", {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({ fullName, email, password }),
+                        });
+                        
+
+                        if (!res.ok) {
+                            const data = await res.json();
+                            setError(data.error || "Signup failed");
+                            setIsLoading(false);
+                            return;
+                        }
+
+                        const data = await res.json();
+                        // Optionally store token
+                        
+                        localStorage.setItem("token", data.token);
+                        router.push("/auth/login");
+                        } catch (err) {
+                        setError("Network error");
+                        setIsLoading(false);
+                    }
+                }}
+            >
+
               <div className="space-y-2">
                 <Label htmlFor="fullName">Full Name</Label>
                 <Input

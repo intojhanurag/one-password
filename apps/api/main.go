@@ -13,12 +13,16 @@ import (
 	"github.com/intojhanurag/One-Password/apps/api/internals/models"
 	"github.com/intojhanurag/One-Password/apps/api/internals/repository"
 	"github.com/intojhanurag/One-Password/apps/api/internals/services"
+	"github.com/rs/cors"
+
 )
 
 func main() {
+
 	cfg := config.Load()
 
 	db := database.Connect(cfg.DatabaseURL)
+
 
 	
 	if err := db.AutoMigrate(
@@ -128,9 +132,17 @@ func main() {
 	mux.HandleFunc("/apikey-teams/delete", authMW(aktmHandler.Detach))
 
 
+	c := cors.New(cors.Options{
+		AllowedOrigins:   []string{"http://localhost:3000"}, // change to your frontend URL
+		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowedHeaders:   []string{"Authorization", "Content-Type"},
+		AllowCredentials: true,
+	})
+
+
 	addr := ":" + cfg.Port
 	fmt.Println("Starting server at", addr)
-	if err := http.ListenAndServe(addr, mux); err != nil {
+	if err := http.ListenAndServe(addr, c.Handler(mux)); err != nil {
 		log.Fatal(err)
 	}
 }
