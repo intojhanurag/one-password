@@ -11,6 +11,7 @@ import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
 import { KeyRound, Shield } from "lucide-react"
+import { apiService } from "@/lib/api"
 
 export default function SignUpPage() {
   const [email, setEmail] = useState("")
@@ -49,32 +50,19 @@ export default function SignUpPage() {
                     setIsLoading(true);
 
                     if(password !== confirmPassword){
-                        setError("password do not match")
+                        setError("Passwords do not match");
                         setIsLoading(false);
                         return;
                     }
                     try {
-                        const res = await fetch("http://localhost:5000/auth/signup", {
-                            method: "POST",
-                            headers: { "Content-Type": "application/json" },
-                            body: JSON.stringify({ fullName, email, password }),
-                        });
+                        const data = await apiService.signup({ fullName, email, password });
                         
-
-                        if (!res.ok) {
-                            const data = await res.json();
-                            setError(data.error || "Signup failed");
-                            setIsLoading(false);
-                            return;
-                        }
-
-                        const data = await res.json();
-                        // Optionally store token
-                        
+                        // Store token and redirect to login
                         localStorage.setItem("token", data.token);
                         router.push("/auth/login");
-                        } catch (err) {
-                        setError("Network error");
+                    } catch (err: any) {
+                        setError(err.message || "Signup failed");
+                    } finally {
                         setIsLoading(false);
                     }
                 }}

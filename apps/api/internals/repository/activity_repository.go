@@ -14,9 +14,13 @@ type ActivityRepository struct {
 type ActivityRepositoryInterface interface {
 	Create(activity *models.Activity) error
 	List(limit, offset int) ([]models.Activity, error)
+	ListByUser(userID uint, limit, offset int) ([]models.Activity, error)
 	GetByID(id string) (*models.Activity, error)
 	CountAll() (int64, error)
+	CountByUser(userID uint) (int64, error)
 	CountToday() (int64, error)
+	CountTodayByUser(userID uint) (int64, error)
+	CountWeekByUser(userID uint) (int64, error)
 	CountUniqueUsers() (int64, error)
 	CountSecurityEvents() (int64, error)
 }
@@ -81,6 +85,47 @@ func (r *ActivityRepository) CountSecurityEvents() (int64, error) {
 	var count int64
 	err := r.db.Model(&models.Activity{}).
 		Where("action IN ?", []string{"apikey.reveal", "apikey.delete"}).
+		Count(&count).Error
+	return count, err
+}
+
+// List activities by user with pagination
+func (r *ActivityRepository) ListByUser(userID uint, limit, offset int) ([]models.Activity, error) {
+	var activities []models.Activity
+	err := r.db.
+		Where("user_id = ?", userID).
+		Order("created_at DESC").
+		Limit(limit).
+		Offset(offset).
+		Find(&activities).Error
+	return activities, err
+}
+
+// Count activities by user
+func (r *ActivityRepository) CountByUser(userID uint) (int64, error) {
+	var count int64
+	err := r.db.Model(&models.Activity{}).
+		Where("user_id = ?", userID).
+		Count(&count).Error
+	return count, err
+}
+
+// Count today's activities by user
+func (r *ActivityRepository) CountTodayByUser(userID uint) (int64, error) {
+	var count int64
+	startOfDay := time.Now().Truncate(24 * time.Hour)
+	err := r.db.Model(&models.Activity{}).
+		Where("user_id = ? AND created_at >= ?", userID, startOfDay).
+		Count(&count).Error
+	return count, err
+}
+
+// Count this week's activities by user
+func (r *ActivityRepository) CountWeekByUser(userID uint) (int64, error) {
+	var count int64
+	weekAgo := time.Now().AddDate(0, 0, -7)
+	err := r.db.Model(&models.Activity{}).
+		Where("user_id = ? AND created_at >= ?", userID, weekAgo).
 		Count(&count).Error
 	return count, err
 }

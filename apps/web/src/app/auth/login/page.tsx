@@ -12,6 +12,7 @@ import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
 import { KeyRound, Shield } from "lucide-react"
+import { apiService, type LoginResponse } from "@/lib/api"
 
 export default function LoginPage() {
   const [email, setEmail] = useState("")
@@ -46,25 +47,17 @@ export default function LoginPage() {
                     setError(null);
                     setIsLoading(true);
                     try {
-                        const res = await fetch("http://localhost:5000/auth/login", {
-                            method: "POST",
-                            headers: { "Content-Type": "application/json" },
-                            body: JSON.stringify({ email, password }),
-                        });
-
-                        if (!res.ok) {
-                            const data = await res.json();
-                            setError(data.error || "Login failed");
-                            setIsLoading(false);
-                            return;
-                        }
-
-                        const data = await res.json();
-                        // Optionally store token
+                        const data: LoginResponse = await apiService.login({ email, password });
+                        
+                        // Store token and user data
                         localStorage.setItem("token", data.token);
+                        const { token, ...user } = data;
+                        localStorage.setItem("user", JSON.stringify(user));
+                        
                         router.push("/dashboard");
-                        } catch (err) {
-                        setError("Network error");
+                    } catch (err: any) {
+                        setError(err.message || "Login failed");
+                    } finally {
                         setIsLoading(false);
                     }
                 }}
