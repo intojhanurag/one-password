@@ -139,7 +139,7 @@ export default function SettingsPage() {
       <div className="flex items-center justify-center h-64">
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading settings...</p>
+          <p className="text-slate-300">Loading settings...</p>
         </div>
       </div>
     )
@@ -149,23 +149,23 @@ export default function SettingsPage() {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Settings</h1>
-        <p className="text-gray-600 dark:text-gray-400 mt-1">
+        <h1 className="text-3xl font-bold text-white">Settings</h1>
+        <p className="text-slate-300 mt-1">
           Manage your account settings and preferences
         </p>
       </div>
 
       {error && (
-        <Alert variant="destructive">
+        <Alert variant="destructive" className="bg-red-900/20 border-red-800">
           <AlertTriangle className="h-4 w-4" />
-          <AlertDescription>{error}</AlertDescription>
+          <AlertDescription className="text-red-300">{error}</AlertDescription>
         </Alert>
       )}
 
       {success && (
-        <Alert className="border-green-200 bg-green-50 dark:bg-green-900/20">
-          <Shield className="h-4 w-4 text-green-600" />
-          <AlertDescription className="text-green-800 dark:text-green-200">
+        <Alert className="bg-green-900/20 border-green-800">
+          <Shield className="h-4 w-4 text-green-400" />
+          <AlertDescription className="text-green-300">
             {success}
           </AlertDescription>
         </Alert>
@@ -173,9 +173,9 @@ export default function SettingsPage() {
 
       <div className="grid gap-6">
         {/* Profile Settings */}
-        <Card>
+        <Card className="bg-slate-800 border-slate-700">
           <CardHeader>
-            <CardTitle className="flex items-center">
+            <CardTitle className="flex items-center text-white">
               <User className="h-5 w-5 mr-2" />
               Profile Information
             </CardTitle>
@@ -184,26 +184,32 @@ export default function SettingsPage() {
             <form onSubmit={handleProfileUpdate} className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="fullName">Full Name</Label>
+                  <Label htmlFor="fullName" className="text-slate-300">Full Name</Label>
                   <Input
                     id="fullName"
                     value={profileForm.fullName}
                     onChange={(e) => setProfileForm(prev => ({ ...prev, fullName: e.target.value }))}
                     placeholder="Your full name"
+                    className="bg-slate-700 border-slate-600 text-white placeholder-slate-400 focus:border-blue-500"
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="email">Email</Label>
+                  <Label htmlFor="email" className="text-slate-300">Email</Label>
                   <Input
                     id="email"
                     type="email"
                     value={profileForm.email}
                     onChange={(e) => setProfileForm(prev => ({ ...prev, email: e.target.value }))}
                     placeholder="your@email.com"
+                    className="bg-slate-700 border-slate-600 text-white placeholder-slate-400 focus:border-blue-500"
                   />
                 </div>
               </div>
-              <Button type="submit" disabled={saving}>
+              <Button 
+                type="submit" 
+                disabled={saving}
+                className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700"
+              >
                 <Save className="h-4 w-4 mr-2" />
                 {saving ? "Saving..." : "Save Changes"}
               </Button>
@@ -212,9 +218,9 @@ export default function SettingsPage() {
         </Card>
 
         {/* Password Settings */}
-        <Card>
+        <Card className="bg-slate-800 border-slate-700">
           <CardHeader>
-            <CardTitle className="flex items-center">
+            <CardTitle className="flex items-center text-white">
               <Shield className="h-5 w-5 mr-2" />
               Change Password
             </CardTitle>
@@ -222,38 +228,45 @@ export default function SettingsPage() {
           <CardContent>
             <form onSubmit={handlePasswordChange} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="currentPassword">Current Password</Label>
+                <Label htmlFor="currentPassword" className="text-slate-300">Current Password</Label>
                 <Input
                   id="currentPassword"
                   type="password"
                   value={passwordForm.currentPassword}
                   onChange={(e) => setPasswordForm(prev => ({ ...prev, currentPassword: e.target.value }))}
                   placeholder="Enter current password"
+                  className="bg-slate-700 border-slate-600 text-white placeholder-slate-400 focus:border-blue-500"
                 />
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="newPassword">New Password</Label>
+                  <Label htmlFor="newPassword" className="text-slate-300">New Password</Label>
                   <Input
                     id="newPassword"
                     type="password"
                     value={passwordForm.newPassword}
                     onChange={(e) => setPasswordForm(prev => ({ ...prev, newPassword: e.target.value }))}
                     placeholder="Enter new password"
+                    className="bg-slate-700 border-slate-600 text-white placeholder-slate-400 focus:border-blue-500"
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="confirmPassword">Confirm New Password</Label>
+                  <Label htmlFor="confirmPassword" className="text-slate-300">Confirm New Password</Label>
                   <Input
                     id="confirmPassword"
                     type="password"
                     value={passwordForm.confirmPassword}
                     onChange={(e) => setPasswordForm(prev => ({ ...prev, confirmPassword: e.target.value }))}
                     placeholder="Confirm new password"
+                    className="bg-slate-700 border-slate-600 text-white placeholder-slate-400 focus:border-blue-500"
                   />
                 </div>
               </div>
-              <Button type="submit" disabled={saving}>
+              <Button 
+                type="submit" 
+                disabled={saving}
+                className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700"
+              >
                 <Shield className="h-4 w-4 mr-2" />
                 {saving ? "Changing..." : "Change Password"}
               </Button>
@@ -262,9 +275,9 @@ export default function SettingsPage() {
         </Card>
 
         {/* Account Information */}
-        <Card>
+        <Card className="bg-slate-800 border-slate-700">
           <CardHeader>
-            <CardTitle className="flex items-center">
+            <CardTitle className="flex items-center text-white">
               <Settings className="h-5 w-5 mr-2" />
               Account Information
             </CardTitle>
@@ -273,12 +286,12 @@ export default function SettingsPage() {
             <div className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <Label className="text-sm font-medium text-gray-600 dark:text-gray-400">User ID</Label>
-                  <p className="text-gray-900 dark:text-white">{user?.id}</p>
+                  <Label className="text-sm font-medium text-slate-300">User ID</Label>
+                  <p className="text-white">{user?.id}</p>
                 </div>
                 <div>
-                  <Label className="text-sm font-medium text-gray-600 dark:text-gray-400">Member Since</Label>
-                  <p className="text-gray-900 dark:text-white">
+                  <Label className="text-sm font-medium text-slate-300">Member Since</Label>
+                  <p className="text-white">
                     {user?.createdAt ? new Date(user.createdAt).toLocaleDateString() : "N/A"}
                   </p>
                 </div>
@@ -288,9 +301,9 @@ export default function SettingsPage() {
         </Card>
 
         {/* Danger Zone */}
-        <Card className="border-red-200 dark:border-red-800">
+        <Card className="border-red-800 bg-slate-800">
           <CardHeader>
-            <CardTitle className="flex items-center text-red-600">
+            <CardTitle className="flex items-center text-red-400">
               <AlertTriangle className="h-5 w-5 mr-2" />
               Danger Zone
             </CardTitle>
@@ -298,11 +311,15 @@ export default function SettingsPage() {
           <CardContent>
             <div className="space-y-4">
               <div>
-                <h4 className="font-medium text-gray-900 dark:text-white mb-2">Sign Out</h4>
-                <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+                <h4 className="font-medium text-white mb-2">Sign Out</h4>
+                <p className="text-sm text-slate-300 mb-4">
                   Sign out of your account on this device
                 </p>
-                <Button variant="outline" onClick={handleSignOut} className="text-red-600 border-red-600 hover:bg-red-50">
+                <Button 
+                  variant="outline" 
+                  onClick={handleSignOut} 
+                  className="text-red-400 border-red-800 hover:bg-red-900/20"
+                >
                   <LogOut className="h-4 w-4 mr-2" />
                   Sign Out
                 </Button>

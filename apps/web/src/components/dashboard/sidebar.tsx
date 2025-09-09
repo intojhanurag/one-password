@@ -49,17 +49,17 @@ export function Sidebar({ user }: SidebarProps) {
       {/* Sidebar */}
       <div
         className={cn(
-          "fixed inset-y-0 left-0 z-40 w-64 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700 transform transition-transform duration-200 ease-in-out lg:translate-x-0",
+          "fixed inset-y-0 left-0 z-40 w-64 bg-slate-800 border-r border-slate-700 transform transition-transform duration-200 ease-in-out lg:translate-x-0",
           isMobileMenuOpen ? "translate-x-0" : "-translate-x-full",
         )}
       >
         <div className="flex flex-col h-full">
           {/* Logo */}
-          <div className="flex items-center px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-            <div className="bg-blue-600 p-2 rounded-lg">
-              <KeyRound className="h-6 w-6 text-white" />
+          <div className="flex items-center px-6 py-4 border-b border-slate-700">
+            <div className="bg-gradient-to-r from-yellow-400 to-yellow-500 p-2 rounded-lg">
+              <KeyRound className="h-6 w-6 text-black" />
             </div>
-            <span className="ml-3 text-lg font-semibold text-gray-900 dark:text-white">API Key Manager</span>
+            <span className="ml-3 text-lg font-semibold text-white">One-Password</span>
           </div>
 
           {/* Navigation */}
@@ -73,8 +73,8 @@ export function Sidebar({ user }: SidebarProps) {
                   className={cn(
                     "flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors",
                     isActive
-                      ? "bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300"
-                      : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800",
+                      ? "bg-blue-900/30 text-blue-300"
+                      : "text-slate-300 hover:bg-slate-700",
                   )}
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
@@ -86,9 +86,9 @@ export function Sidebar({ user }: SidebarProps) {
           </nav>
 
           {/* Quick Actions */}
-          <div className="px-4 py-4 border-t border-gray-200 dark:border-gray-700">
+          <div className="px-4 py-4 border-t border-slate-700">
             <Button asChild className="w-full mb-3">
-              <Link href="/dashboard/keys/new">
+              <Link href="/dashboard/keys">
                 <Plus className="h-4 w-4 mr-2" />
                 Add API Key
               </Link>
@@ -96,15 +96,20 @@ export function Sidebar({ user }: SidebarProps) {
           </div>
 
           {/* User Profile */}
-          <div className="px-4 py-4 border-t border-gray-200 dark:border-gray-700">
+          <div className="px-4 py-4 border-t border-slate-700">
             <div className="flex items-center mb-3">
-              <div className="bg-gray-200 dark:bg-gray-700 rounded-full p-2">
-                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                  {user?.email?.toUpperCase()}
+              <div className="bg-gradient-to-r from-blue-500 to-purple-600 rounded-full p-2">
+                <span className="text-sm font-medium text-white">
+                  {user?.fullName?.charAt(0)?.toUpperCase() || user?.email?.charAt(0)?.toUpperCase() || "U"}
                 </span>
               </div>
               <div className="ml-3 flex-1 min-w-0">
-                <p className="text-sm font-medium text-gray-900 dark:text-white truncate">{user?.email}</p>
+                <p className="text-sm font-medium text-white truncate">
+                  {user?.fullName || user?.email || "User"}
+                </p>
+                <p className="text-xs text-slate-400 truncate">
+                  {user?.email}
+                </p>
               </div>
             </div>
             <Button variant="outline" size="sm" onClick={handleSignOut} className="w-full bg-transparent">

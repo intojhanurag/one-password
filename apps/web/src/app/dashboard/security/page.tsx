@@ -147,7 +147,7 @@ export default function SecurityPage() {
       <div className="flex items-center justify-center h-64">
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading security data...</p>
+          <p className="text-slate-300">Loading security data...</p>
         </div>
       </div>
     )
@@ -160,52 +160,52 @@ export default function SecurityPage() {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Security</h1>
-        <p className="text-gray-600 dark:text-gray-400 mt-1">
+        <h1 className="text-3xl font-bold text-white">Security</h1>
+        <p className="text-slate-300 mt-1">
           Manage API key access and security settings
         </p>
       </div>
 
       {error && (
-        <Alert variant="destructive">
+        <Alert variant="destructive" className="bg-red-900/20 border-red-800">
           <AlertTriangle className="h-4 w-4" />
-          <AlertDescription>{error}</AlertDescription>
+          <AlertDescription className="text-red-300">{error}</AlertDescription>
         </Alert>
       )}
 
       {/* Security Overview */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Card>
+        <Card className="bg-slate-800 border-slate-700">
           <CardContent className="p-6">
             <div className="flex items-center">
-              <Shield className="h-8 w-8 text-blue-600" />
+              <Shield className="h-8 w-8 text-blue-400" />
               <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Security Score</p>
-                <p className="text-2xl font-bold text-gray-900 dark:text-white">{securityScore}%</p>
+                <p className="text-sm font-medium text-slate-300">Security Score</p>
+                <p className="text-2xl font-bold text-white">{securityScore}%</p>
               </div>
             </div>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="bg-slate-800 border-slate-700">
           <CardContent className="p-6">
             <div className="flex items-center">
-              <KeyRound className="h-8 w-8 text-green-600" />
+              <KeyRound className="h-8 w-8 text-green-400" />
               <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Total API Keys</p>
-                <p className="text-2xl font-bold text-gray-900 dark:text-white">{apiKeys.length}</p>
+                <p className="text-sm font-medium text-slate-300">Total API Keys</p>
+                <p className="text-2xl font-bold text-white">{apiKeys.length}</p>
               </div>
             </div>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="bg-slate-800 border-slate-700">
           <CardContent className="p-6">
             <div className="flex items-center">
-              <Users className="h-8 w-8 text-purple-600" />
+              <Users className="h-8 w-8 text-purple-400" />
               <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Teams</p>
-                <p className="text-2xl font-bold text-gray-900 dark:text-white">{teams.length}</p>
+                <p className="text-sm font-medium text-slate-300">Teams</p>
+                <p className="text-2xl font-bold text-white">{teams.length}</p>
               </div>
             </div>
           </CardContent>
@@ -214,10 +214,10 @@ export default function SecurityPage() {
 
       {/* Security Recommendations */}
       {recommendations.length > 0 && (
-        <Card>
+        <Card className="bg-slate-800 border-slate-700">
           <CardHeader>
-            <CardTitle className="flex items-center">
-              <CheckCircle className="h-5 w-5 text-green-600 mr-2" />
+            <CardTitle className="flex items-center text-white">
+              <CheckCircle className="h-5 w-5 text-green-400 mr-2" />
               Security Recommendations
             </CardTitle>
           </CardHeader>
@@ -225,8 +225,8 @@ export default function SecurityPage() {
             <ul className="space-y-2">
               {recommendations.map((recommendation, index) => (
                 <li key={index} className="flex items-start">
-                  <div className="flex-shrink-0 w-2 h-2 bg-blue-600 rounded-full mt-2 mr-3"></div>
-                  <p className="text-gray-700 dark:text-gray-300">{recommendation}</p>
+                  <div className="flex-shrink-0 w-2 h-2 bg-blue-400 rounded-full mt-2 mr-3"></div>
+                  <p className="text-slate-300">{recommendation}</p>
                 </li>
               ))}
             </ul>
@@ -235,18 +235,18 @@ export default function SecurityPage() {
       )}
 
       {/* API Key Access Management */}
-      <Card>
+      <Card className="bg-slate-800 border-slate-700">
         <CardHeader>
-          <CardTitle>API Key Access Management</CardTitle>
+          <CardTitle className="text-white">API Key Access Management</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-6">
             {/* Team Selection */}
             <div>
-              <Label htmlFor="team-select">Select Team</Label>
+              <Label htmlFor="team-select" className="text-slate-300">Select Team</Label>
               <select
                 id="team-select"
-                className="w-full mt-1 p-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800"
+                className="w-full mt-1 p-2 border border-slate-600 rounded-md bg-slate-700 text-white"
                 value={selectedTeam?.id || ""}
                 onChange={(e) => {
                   const teamId = parseInt(e.target.value)
@@ -269,11 +269,11 @@ export default function SecurityPage() {
             {selectedTeam && (
               <div className="space-y-4">
                 <div>
-                  <h4 className="font-medium text-gray-900 dark:text-white mb-2">
+                  <h4 className="font-medium text-white mb-2">
                     API Keys assigned to {selectedTeam.name}
                   </h4>
                   {apiKeyTeams.length === 0 ? (
-                    <p className="text-gray-500 text-sm">No API keys assigned to this team</p>
+                    <p className="text-slate-400 text-sm">No API keys assigned to this team</p>
                   ) : (
                     <div className="space-y-2">
                       {apiKeyTeams.map((apiKeyTeam) => {
@@ -281,12 +281,12 @@ export default function SecurityPage() {
                         return apiKey ? (
                           <div
                             key={apiKeyTeam.id}
-                            className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg"
+                            className="flex items-center justify-between p-3 bg-slate-700 rounded-lg"
                           >
                             <div>
-                              <p className="font-medium">{apiKey.name}</p>
+                              <p className="font-medium text-white">{apiKey.name}</p>
                               {apiKey.description && (
-                                <p className="text-sm text-gray-600 dark:text-gray-400">
+                                <p className="text-sm text-slate-300">
                                   {apiKey.description}
                                 </p>
                               )}
@@ -295,7 +295,7 @@ export default function SecurityPage() {
                               variant="outline"
                               size="sm"
                               onClick={() => handleDetachAPIKey(selectedTeam.id, apiKey.id)}
-                              className="text-red-600 hover:text-red-700"
+                              className="text-red-400 border-red-800 hover:bg-red-900/20"
                             >
                               <Trash2 className="h-4 w-4" />
                             </Button>
@@ -307,7 +307,7 @@ export default function SecurityPage() {
                 </div>
 
                 <div>
-                  <h4 className="font-medium text-gray-900 dark:text-white mb-2">
+                  <h4 className="font-medium text-white mb-2">
                     Available API Keys to Assign
                   </h4>
                   <div className="space-y-2">
@@ -316,12 +316,12 @@ export default function SecurityPage() {
                       .map((apiKey) => (
                         <div
                           key={apiKey.id}
-                          className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg"
+                          className="flex items-center justify-between p-3 bg-slate-700 rounded-lg"
                         >
                           <div>
-                            <p className="font-medium">{apiKey.name}</p>
+                            <p className="font-medium text-white">{apiKey.name}</p>
                             {apiKey.description && (
-                              <p className="text-sm text-gray-600 dark:text-gray-400">
+                              <p className="text-sm text-slate-300">
                                 {apiKey.description}
                               </p>
                             )}
@@ -330,6 +330,7 @@ export default function SecurityPage() {
                             variant="outline"
                             size="sm"
                             onClick={() => handleAttachAPIKey(selectedTeam.id, apiKey.id)}
+                            className="border-slate-600 text-slate-300 hover:bg-slate-600"
                           >
                             Assign
                           </Button>

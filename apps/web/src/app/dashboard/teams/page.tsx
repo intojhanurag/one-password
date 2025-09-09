@@ -27,8 +27,6 @@ interface TeamMembership {
   createdAt: string
 }
 
-// Using APIKeyTeam type from API layer
-
 export default function TeamsPage() {
   const router = useRouter()
   const [teams, setTeams] = useState<Team[]>([])
@@ -63,10 +61,11 @@ export default function TeamsPage() {
   const loadTeamsData = async () => {
     try {
       setLoading(true)
-      const [teamsData, membershipsData] = await Promise.all([
-        apiService.getTeamsDashboard(),
-        apiService.listTeamMemberships()
-      ])
+      setError(null)
+      
+      // Try to load teams data with better error handling
+      const teamsData = await apiService.getTeamsDashboard()
+      
       // Backend returns teamsOwned array; normalize to Team[]
       const normalizedTeams: Team[] = (teamsData.teamsOwned || []).map((t) => ({
         id: t.id,
@@ -77,9 +76,21 @@ export default function TeamsPage() {
         updatedAt: t.createdAt,
       }))
       setTeams(normalizedTeams)
-      setTeamMemberships(membershipsData || [])
+      
+      // Try to load team memberships, but don't fail if it doesn't work
+      try {
+        const membershipsData = await apiService.listTeamMemberships()
+        setTeamMemberships(membershipsData || [])
+      } catch (membershipError) {
+        console.warn("Failed to load team memberships:", membershipError)
+        setTeamMemberships([])
+      }
     } catch (err: any) {
+      console.error("Teams data error:", err)
       setError(err.message || "Failed to load teams data")
+      // Set empty arrays to prevent further errors
+      setTeams([])
+      setTeamMemberships([])
     } finally {
       setLoading(false)
     }
@@ -142,7 +153,7 @@ export default function TeamsPage() {
       <div className="flex items-center justify-center h-64">
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading teams...</p>
+          <p className="text-slate-300">Loading teams...</p>
         </div>
       </div>
     )
@@ -153,54 +164,69 @@ export default function TeamsPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Teams</h1>
-          <p className="text-gray-600 dark:text-gray-400 mt-1">
+          <h1 className="text-3xl font-bold text-white">Teams</h1>
+          <p className="text-slate-300 mt-1">
             Manage your teams and memberships
           </p>
         </div>
-        <Button onClick={() => setShowCreateForm(true)}>
+        <Button 
+          onClick={() => setShowCreateForm(true)}
+          className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700"
+        >
           <Plus className="h-4 w-4 mr-2" />
           Create Team
         </Button>
       </div>
 
       {error && (
-        <Alert variant="destructive">
+        <Alert variant="destructive" className="bg-red-900/20 border-red-800">
           <Shield className="h-4 w-4" />
-          <AlertDescription>{error}</AlertDescription>
+          <AlertDescription className="text-red-300">{error}</AlertDescription>
         </Alert>
       )}
 
       {/* Create Team Form */}
       {showCreateForm && (
-        <Card>
+        <Card className="bg-slate-800 border-slate-700">
           <CardHeader>
-            <CardTitle>Create New Team</CardTitle>
+            <CardTitle className="text-white">Create New Team</CardTitle>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleCreateTeam} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="name">Team Name *</Label>
+                <Label htmlFor="name" className="text-slate-300">Team Name *</Label>
                 <Input
                   id="name"
                   value={createForm.name}
                   onChange={(e) => setCreateForm(prev => ({ ...prev, name: e.target.value }))}
                   placeholder="My Team"
                   required
+                  className="bg-slate-700 border-slate-600 text-white placeholder-slate-400 focus:border-blue-500"
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="description">Description</Label>
+                <Label htmlFor="description" className="text-slate-300">Description</Label>
                 <Input
                   id="description"
                   value={createForm.description}
                   onChange={(e) => setCreateForm(prev => ({ ...prev, description: e.target.value }))}
                   placeholder="Optional description"
+                  className="bg-slate-700 border-slate-600 text-white placeholder-slate-400 focus:border-blue-500"
                 />
               </div>
               <div className="flex space-x-2">
-                <Button type="submit">Create Team</Button>
-                <Button type="button" variant="outline" onClick={() => setShowCreateForm(false)}>
+                <Button 
+                  type="submit"
+                  className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700"
+                >
+                  Create Team
+                </Button>
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  onClick={() => setShowCreateForm(false)}
+                  className="border-slate-600 text-slate-300 hover:bg-slate-700"
+                >
                   Cancel
                 </Button>
               </div>
@@ -211,16 +237,19 @@ export default function TeamsPage() {
 
       {/* Teams List */}
       {teams.length === 0 ? (
-        <Card>
+        <Card className="bg-slate-800 border-slate-700">
           <CardContent className="text-center py-12">
-            <Users className="h-12 w-12 mx-auto mb-4 text-gray-400" />
-            <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+            <Users className="h-12 w-12 mx-auto mb-4 text-slate-400" />
+            <h3 className="text-lg font-medium text-white mb-2">
               No Teams Yet
             </h3>
-            <p className="text-gray-600 dark:text-gray-400 mb-4">
+            <p className="text-slate-300 mb-4">
               Create your first team to start collaborating
             </p>
-            <Button onClick={() => setShowCreateForm(true)}>
+            <Button 
+              onClick={() => setShowCreateForm(true)}
+              className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700"
+            >
               <Plus className="h-4 w-4 mr-2" />
               Create Your First Team
             </Button>
@@ -231,12 +260,12 @@ export default function TeamsPage() {
           {teams.map((team) => {
             const teamMembers = teamMemberships.filter(m => m.teamId === team.id)
             return (
-              <Card key={team.id}>
+              <Card key={team.id} className="bg-slate-800 border-slate-700">
                 <CardHeader>
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-2">
-                      <Users className="h-5 w-5 text-blue-600" />
-                      <CardTitle className="text-xl">{team.name}</CardTitle>
+                      <Users className="h-5 w-5 text-blue-400" />
+                      <CardTitle className="text-xl text-white">{team.name}</CardTitle>
                     </div>
                     <div className="flex space-x-2">
                       <Button
@@ -246,6 +275,7 @@ export default function TeamsPage() {
                           setSelectedTeam(team)
                           loadTeamAPIKeys(team.id)
                         }}
+                        className="border-slate-600 text-slate-300 hover:bg-slate-700"
                       >
                         <KeyRound className="h-4 w-4 mr-2" />
                         Manage API Keys
@@ -253,28 +283,28 @@ export default function TeamsPage() {
                     </div>
                   </div>
                   {team.description && (
-                    <p className="text-gray-600 dark:text-gray-400">{team.description}</p>
+                    <p className="text-slate-300">{team.description}</p>
                   )}
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
                     {/* Team Members */}
                     <div>
-                      <h4 className="font-medium text-gray-900 dark:text-white mb-2">
+                      <h4 className="font-medium text-white mb-2">
                         Team Members ({teamMembers.length})
                       </h4>
                       {teamMembers.length === 0 ? (
-                        <p className="text-gray-500 text-sm">No members yet</p>
+                        <p className="text-slate-400 text-sm">No members yet</p>
                       ) : (
                         <div className="space-y-2">
                           {teamMembers.map((member) => (
                             <div
                               key={member.id}
-                              className="flex items-center justify-between p-2 bg-gray-50 dark:bg-gray-800 rounded-lg"
+                              className="flex items-center justify-between p-2 bg-slate-700 rounded-lg"
                             >
                               <div>
-                                <p className="text-sm font-medium">User ID: {member.userId}</p>
-                                <p className="text-xs text-gray-500">
+                                <p className="text-sm font-medium text-white">User ID: {member.userId}</p>
+                                <p className="text-xs text-slate-400">
                                   Status: {member.status} • Joined {new Date(member.createdAt).toLocaleDateString()}
                                 </p>
                               </div>
@@ -282,7 +312,7 @@ export default function TeamsPage() {
                                 variant="outline"
                                 size="sm"
                                 onClick={() => handleRemoveMember(team.id, member.userId)}
-                                className="text-red-600 hover:text-red-700"
+                                className="text-red-400 hover:text-red-300 border-red-800 hover:bg-red-900/20"
                               >
                                 <Trash2 className="h-4 w-4" />
                               </Button>
@@ -293,8 +323,8 @@ export default function TeamsPage() {
                     </div>
 
                     {/* Add Member Form */}
-                    <div className="border-t pt-4">
-                      <h4 className="font-medium text-gray-900 dark:text-white mb-2">
+                    <div className="border-t border-slate-700 pt-4">
+                      <h4 className="font-medium text-white mb-2">
                         Add Team Member
                       </h4>
                       <form onSubmit={handleAddMember} className="flex space-x-2">
@@ -303,9 +333,13 @@ export default function TeamsPage() {
                           placeholder="User ID"
                           value={membershipForm.userId}
                           onChange={(e) => setMembershipForm({ userId: e.target.value })}
-                          className="flex-1"
+                          className="flex-1 bg-slate-700 border-slate-600 text-white placeholder-slate-400 focus:border-blue-500"
                         />
-                        <Button type="submit" size="sm">
+                        <Button 
+                          type="submit" 
+                          size="sm"
+                          className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700"
+                        >
                           <UserPlus className="h-4 w-4 mr-2" />
                           Add
                         </Button>

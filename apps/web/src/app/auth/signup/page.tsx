@@ -1,7 +1,6 @@
 "use client"
 
 import type React from "react"
-
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -10,7 +9,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
-import { KeyRound, Shield } from "lucide-react"
+import { KeyRound, Shield, ArrowLeft } from "lucide-react"
 import { apiService } from "@/lib/api"
 
 export default function SignUpPage() {
@@ -24,22 +23,30 @@ export default function SignUpPage() {
 
   
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 p-4">
+    <div className="min-h-screen bg-slate-900 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
-        <div className="text-center mb-8">
-          <div className="flex items-center justify-center mb-4">
-            <div className="bg-blue-600 p-3 rounded-full">
-              <KeyRound className="h-8 w-8 text-white" />
-            </div>
-          </div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">API Key Manager</h1>
-          <p className="text-gray-600 dark:text-gray-400 mt-2">Create your secure account</p>
+        {/* Back to Home */}
+        <div className="mb-6">
+          <Link href="/" className="inline-flex items-center text-slate-400 hover:text-white transition-colors">
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Back to Home
+          </Link>
         </div>
 
-        <Card className="shadow-xl">
+        <div className="text-center mb-8">
+          <div className="flex items-center justify-center mb-4">
+            <div className="bg-gradient-to-r from-yellow-400 to-yellow-500 p-3 rounded-xl">
+              <KeyRound className="h-8 w-8 text-black" />
+            </div>
+          </div>
+          <h1 className="text-3xl font-bold text-white">One-Password</h1>
+          <p className="text-slate-300 mt-2">Create your secure account</p>
+        </div>
+
+        <Card className="shadow-xl bg-slate-800 border-slate-700">
           <CardHeader className="space-y-1">
-            <CardTitle className="text-2xl font-bold">Create Account</CardTitle>
-            <CardDescription>Sign up to start managing your API keys securely</CardDescription>
+            <CardTitle className="text-2xl font-bold text-white">Create Account</CardTitle>
+            <CardDescription className="text-slate-300">Sign up to start managing your API keys securely</CardDescription>
           </CardHeader>
           <CardContent>
             <form  
@@ -57,9 +64,11 @@ export default function SignUpPage() {
                     try {
                         const data = await apiService.signup({ fullName, email, password });
                         
-                        // Store token and redirect to login
+                        // Store token and redirect to dashboard
                         localStorage.setItem("token", data.token);
-                        router.push("/auth/login");
+                        const { token, ...user } = data;
+                        localStorage.setItem("user", JSON.stringify(user));
+                        router.push("/dashboard");
                     } catch (err: any) {
                         setError(err.message || "Signup failed");
                     } finally {
@@ -69,7 +78,7 @@ export default function SignUpPage() {
             >
 
               <div className="space-y-2">
-                <Label htmlFor="fullName">Full Name</Label>
+                <Label htmlFor="fullName" className="text-slate-300">Full Name</Label>
                 <Input
                   id="fullName"
                   type="text"
@@ -77,11 +86,11 @@ export default function SignUpPage() {
                   required
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
-                  className="h-11"
+                  className="h-11 bg-slate-700 border-slate-600 text-white placeholder-slate-400 focus:border-blue-500"
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
+                <Label htmlFor="email" className="text-slate-300">Email</Label>
                 <Input
                   id="email"
                   type="email"
@@ -89,11 +98,11 @@ export default function SignUpPage() {
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="h-11"
+                  className="h-11 bg-slate-700 border-slate-600 text-white placeholder-slate-400 focus:border-blue-500"
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="password">Password</Label>
+                <Label htmlFor="password" className="text-slate-300">Password</Label>
                 <Input
                   id="password"
                   type="password"
@@ -101,11 +110,11 @@ export default function SignUpPage() {
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="h-11"
+                  className="h-11 bg-slate-700 border-slate-600 text-white placeholder-slate-400 focus:border-blue-500"
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="confirmPassword">Confirm Password</Label>
+                <Label htmlFor="confirmPassword" className="text-slate-300">Confirm Password</Label>
                 <Input
                   id="confirmPassword"
                   type="password"
@@ -113,25 +122,29 @@ export default function SignUpPage() {
                   required
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
-                  className="h-11"
+                  className="h-11 bg-slate-700 border-slate-600 text-white placeholder-slate-400 focus:border-blue-500"
                 />
               </div>
 
               {error && (
-                <Alert variant="destructive">
+                <Alert variant="destructive" className="bg-red-900/20 border-red-800">
                   <Shield className="h-4 w-4" />
-                  <AlertDescription>{error}</AlertDescription>
+                  <AlertDescription className="text-red-300">{error}</AlertDescription>
                 </Alert>
               )}
 
-              <Button type="submit" className="w-full h-11" disabled={isLoading}>
+              <Button 
+                type="submit" 
+                className="w-full h-11 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-semibold" 
+                disabled={isLoading}
+              >
                 {isLoading ? "Creating account..." : "Create Account"}
               </Button>
             </form>
 
             <div className="mt-6 text-center text-sm">
-              <span className="text-gray-600 dark:text-gray-400">Already have an account? </span>
-              <Link href="/auth/login" className="font-medium text-blue-600 hover:text-blue-500 dark:text-blue-400">
+              <span className="text-slate-400">Already have an account? </span>
+              <Link href="/auth/login" className="font-medium text-blue-400 hover:text-blue-300 transition-colors">
                 Sign in
               </Link>
             </div>
