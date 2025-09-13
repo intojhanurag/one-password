@@ -249,7 +249,7 @@ Authenticate user and get access token.
 ```json
 {
   "email": "john@example.com",
-  "password": "securepassword"
+  "password": "secret"
 }
 ```
 
@@ -370,9 +370,9 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## 🆘 Support
 
 - **Documentation**: [docs.one-password.com](https://docs.one-password.com)
-- **Issues**: [GitHub Issues](https://github.com/yourusername/one-password/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/yourusername/one-password/discussions)
-- **Email**: support@one-password.com
+- **Issues**: [GitHub Issues](https://github.com/intojhanurag/one-password/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/intojhanurag/one-password/discussions)
+- **Email**: aojharaj2004@gmail.com
 
 ## 🙏 Acknowledgments
 
