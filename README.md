@@ -113,7 +113,6 @@ A secure, enterprise-grade API key management platform built with modern technol
 7. **Access the application**
    - Frontend: http://localhost:3000
    - Backend API: http://localhost:5000
-   - API Documentation: http://localhost:5000/docs
 
 ## 📁 Project Structure
 
