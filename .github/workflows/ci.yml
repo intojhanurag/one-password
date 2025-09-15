@@ -60,15 +60,10 @@ jobs:
           node-version: '20'
 
       - name: Install dependencies
-        run: |
-          if [ -f pnpm-lock.yaml ]; then npm i -g pnpm && pnpm i --frozen-lockfile; \
-          elif [ -f package-lock.json ]; then npm ci; \
-          else npm i; fi
+        run: npm ci --ignore-scripts
 
       - name: Lint and typecheck
-        run: |
-          if [ -f pnpm-lock.yaml ]; then pnpm run lint && pnpm run build --no-lint; \
-          else npm run build; fi
+        run: npm run build
 
       - name: Upload Next artifact
         uses: actions/upload-artifact@v4
