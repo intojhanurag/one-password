@@ -57,8 +57,8 @@ export default function APIKeysPage() {
       setLoading(true)
       const keys = await apiService.listAPIKeys()
       setApiKeys(keys)
-    } catch (err: any) {
-      setError(err.message || "Failed to load API keys")
+    } catch {
+      setError("Failed to load API keys")
     } finally {
       setLoading(false)
     }
@@ -87,8 +87,8 @@ export default function APIKeysPage() {
       setSuccessMessage("API key created successfully!")
       setTimeout(() => setSuccessMessage(null), 3000)
       await loadAPIKeys()
-    } catch (err: any) {
-      setError(err.message || "Failed to create API key")
+    } catch {
+      setError("Failed to create API key")
     } finally {
       setCreating(false)
     }
@@ -101,9 +101,17 @@ export default function APIKeysPage() {
       setError(null)
       setRevealing(name)
       const revealedKey = await apiService.revealAPIKey(name)
-      setRevealedKeys(prev => ({ ...prev, [name]: String(revealedKey) }))
-    } catch (err: any) {
-      setError(err.message || "Failed to reveal API key")
+      const hasKeyProp = (value: unknown): value is { key: unknown } =>
+        typeof value === 'object' && value !== null && 'key' in value
+      let keyValue = ''
+      if (typeof revealedKey === 'string') {
+        keyValue = revealedKey
+      } else if (hasKeyProp(revealedKey) && typeof revealedKey.key === 'string') {
+        keyValue = revealedKey.key
+      }
+      if (keyValue) setRevealedKeys(prev => ({ ...prev, [name]: keyValue }))
+    } catch {
+      setError("Failed to reveal API key")
     } finally {
       setRevealing(null)
     }
@@ -116,7 +124,7 @@ export default function APIKeysPage() {
       setTimeout(() => {
         setCopiedKeys(prev => ({ ...prev, [name]: false }))
       }, 2000)
-    } catch (err) {
+    } catch{
       setError("Failed to copy to clipboard")
     }
   }
@@ -133,8 +141,8 @@ export default function APIKeysPage() {
       setDeleting(name)
       await apiService.deleteAPIKey(name)
       await loadAPIKeys()
-    } catch (err: any) {
-      setError(err.message || "Failed to delete API key")
+    } catch{
+      setError("Failed to delete API key")
     } finally {
       setDeleting(null)
     }

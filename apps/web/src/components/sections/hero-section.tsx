@@ -1,7 +1,7 @@
 "use client"
 
 import { PremiumButton } from "@/components/ui/premium-button"
-import { KeyRound, Shield, Zap, Star, Users, Lock, ArrowRight, Award, Gift } from "lucide-react"
+import { KeyRound, Shield, Zap, Star,Lock, ArrowRight, Award, Gift } from "lucide-react"
 
 export function HeroSection() {
   return (

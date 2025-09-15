@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Users, Plus, UserPlus, Trash2, Shield, KeyRound } from "lucide-react"
-import { apiService, type APIKeyTeam } from "@/lib/api"
+import { apiService } from "@/lib/api"
 
 interface Team {
   id: number
@@ -31,7 +31,7 @@ export default function TeamsPage() {
   const router = useRouter()
   const [teams, setTeams] = useState<Team[]>([])
   const [teamMemberships, setTeamMemberships] = useState<TeamMembership[]>([])
-  const [apiKeyTeams, setApiKeyTeams] = useState<APIKeyTeam[]>([])
+  
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [showCreateForm, setShowCreateForm] = useState(false)
@@ -85,9 +85,9 @@ export default function TeamsPage() {
         console.warn("Failed to load team memberships:", membershipError)
         setTeamMemberships([])
       }
-    } catch (err: any) {
-      console.error("Teams data error:", err)
-      setError(err.message || "Failed to load teams data")
+    } catch {
+      console.error("Teams data error:")
+      setError("Failed to load teams data")
       // Set empty arrays to prevent further errors
       setTeams([])
       setTeamMemberships([])
@@ -104,8 +104,8 @@ export default function TeamsPage() {
       setCreateForm({ name: "", description: "" })
       setShowCreateForm(false)
       loadTeamsData()
-    } catch (err: any) {
-      setError(err.message || "Failed to create team")
+    } catch  {
+      setError( "Failed to create team")
     }
   }
 
@@ -121,8 +121,8 @@ export default function TeamsPage() {
       })
       setMembershipForm({ userId: "" })
       loadTeamsData()
-    } catch (err: any) {
-      setError(err.message || "Failed to add team member")
+    } catch {
+      setError( "Failed to add team member")
     }
   }
 
@@ -134,17 +134,8 @@ export default function TeamsPage() {
     try {
       await apiService.deleteTeamMembership({ teamId, userId })
       loadTeamsData()
-    } catch (err: any) {
-      setError(err.message || "Failed to remove team member")
-    }
-  }
-
-  const loadTeamAPIKeys = async (teamId: number) => {
-    try {
-      const apiKeys = await apiService.listAPIKeyTeams(teamId)
-      setApiKeyTeams(apiKeys ?? [])
-    } catch (err: any) {
-      setError(err.message || "Failed to load team API keys")
+    } catch  {
+      setError("Failed to remove team member")
     }
   }
 
@@ -273,7 +264,6 @@ export default function TeamsPage() {
                         size="sm"
                         onClick={() => {
                           setSelectedTeam(team)
-                          loadTeamAPIKeys(team.id)
                         }}
                         className="border-slate-600 text-slate-300 hover:bg-slate-700"
                       >

@@ -1,7 +1,7 @@
 const API_BASE_URL = 'http://localhost:5000';
 const REQUEST_TIMEOUT = 10000; // 10 seconds
 
-export interface APIResponse<T = any> {
+export interface APIResponse<T = unknown> {
   data?: T;
   error?: string;
   message?: string;
@@ -13,6 +13,8 @@ export interface AuthUser {
   fullName: string;
   email: string;
 }
+
+
 
 export interface LoginResponse extends AuthUser {
   token: string;
@@ -47,12 +49,23 @@ export interface APIKeyTeam {
   createdAt: string;
 }
 
+// API Keys types
+export interface APIKey {
+  id: number;
+  name: string;
+  ownerId: number;
+  description?: string;
+  tags?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
 class APIService {
   private getAuthHeaders(): HeadersInit {
     const token = localStorage.getItem('token');
     return {
       'Content-Type': 'application/json',
-      ...(token && { Authorization: `Bearer ${token}` }),
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
     };
   }
 
@@ -102,7 +115,7 @@ class APIService {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data),
     });
-    return this.handleResponse(response);
+    return this.handleResponse<SignupResponse>(response);
   }
 
   async login(data: { email: string; password: string }): Promise<LoginResponse> {
@@ -111,7 +124,7 @@ class APIService {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data),
     });
-    return this.handleResponse(response);
+    return this.handleResponse<LoginResponse>(response);
   }
 
   // Dashboard endpoints
@@ -120,13 +133,20 @@ class APIService {
     totalTeams: number;
     securityPercent: number;
     activitiesThisWeek: number;
-    recentApiKeys: any[];
-    recentlyUsedKeys: any[];
+    recentApiKeys: APIKey[];
+    recentlyUsedKeys: APIKey[];
   }> {
     const response = await this.fetchWithTimeout(`${API_BASE_URL}/dashboard`, {
       headers: this.getAuthHeaders(),
     });
-    return this.handleResponse(response);
+    return this.handleResponse<{
+      totalApiKeys: number;
+      totalTeams: number;
+      securityPercent: number;
+      activitiesThisWeek: number;
+      recentApiKeys: APIKey[];
+      recentlyUsedKeys: APIKey[];
+    }>(response);
   }
 
   async getTeamsDashboard(): Promise<{
@@ -139,7 +159,13 @@ class APIService {
     const response = await this.fetchWithTimeout(`${API_BASE_URL}/dashboard/teams`, {
       headers: this.getAuthHeaders(),
     });
-    return this.handleResponse(response);
+    return this.handleResponse<{
+      totalTeams: number;
+      teamsOwnedCount: number;
+      totalMembers: number;
+      sharedKeys: number;
+      teamsOwned: Array<{ id: number; name: string; description?: string; createdAt: string }>;
+    }>(response);
   }
 
   // API Keys endpoints
@@ -149,14 +175,14 @@ class APIService {
       headers: this.getAuthHeaders(),
       body: JSON.stringify(data),
     });
-    return this.handleResponse(response);
+    return this.handleResponse<unknown>(response);
   }
 
-  async listAPIKeys(): Promise<any[]> {
+  async listAPIKeys(): Promise<APIKey[]> {
     const response = await this.fetchWithTimeout(`${API_BASE_URL}/apikeys/list`, {
       headers: this.getAuthHeaders(),
     });
-    return this.handleResponse(response);
+    return this.handleResponse<APIKey[]>(response);
   }
 
   async revealAPIKey(name: string) {
@@ -165,7 +191,7 @@ class APIService {
       headers: this.getAuthHeaders(),
       body: JSON.stringify({ name }),
     });
-    return this.handleResponse(response);
+    return this.handleResponse<string | { key: string }>(response);
   }
 
   async deleteAPIKey(name: string) {
@@ -174,7 +200,7 @@ class APIService {
       headers: this.getAuthHeaders(),
       body: JSON.stringify({ name }),
     });
-    return this.handleResponse(response);
+    return this.handleResponse<{ success: boolean }>(response);
   }
 
   // Teams endpoints
@@ -184,7 +210,7 @@ class APIService {
       headers: this.getAuthHeaders(),
       body: JSON.stringify(data),
     });
-    return this.handleResponse(response);
+    return this.handleResponse<unknown>(response);
   }
 
   // Team Memberships endpoints
@@ -194,14 +220,14 @@ class APIService {
       headers: this.getAuthHeaders(),
       body: JSON.stringify(data),
     });
-    return this.handleResponse(response);
+    return this.handleResponse<TeamMembership[]>(response);
   }
 
   async listTeamMemberships(): Promise<TeamMembership[]> {
     const response = await this.fetchWithTimeout(`${API_BASE_URL}/team-memberships/list`, {
       headers: this.getAuthHeaders(),
     });
-    return this.handleResponse(response);
+    return this.handleResponse<TeamMembership[]>(response);
   }
 
   async deleteTeamMembership(data: { teamId: number; userId: number }) {
@@ -210,7 +236,7 @@ class APIService {
       headers: this.getAuthHeaders(),
       body: JSON.stringify(data),
     });
-    return this.handleResponse(response);
+    return this.handleResponse<unknown>(response);
   }
 
   // API Key-Team relationship endpoints
@@ -220,14 +246,14 @@ class APIService {
       headers: this.getAuthHeaders(),
       body: JSON.stringify(data),
     });
-    return this.handleResponse(response);
+    return this.handleResponse<APIKeyTeam[]>(response);
   }
 
   async listAPIKeyTeams(teamId: number): Promise<APIKeyTeam[]> {
     const response = await this.fetchWithTimeout(`${API_BASE_URL}/apikey-teams/list?team_id=${teamId}`, {
       headers: this.getAuthHeaders(),
     });
-    return this.handleResponse(response);
+    return this.handleResponse<APIKeyTeam[]>(response);
   }
 
   async detachAPIKeyFromTeam(data: { teamId: number; apiKeyId: number }) {
@@ -236,18 +262,18 @@ class APIService {
       headers: this.getAuthHeaders(),
       body: JSON.stringify(data),
     });
-    return this.handleResponse(response);
+    return this.handleResponse<unknown[]>(response);
   }
 
   // Activity endpoints
-  async listActivities(): Promise<any[]> {
+  async listActivities(): Promise<unknown[]> {
     const response = await this.fetchWithTimeout(`${API_BASE_URL}/dashboard/activity`, {
       headers: this.getAuthHeaders(),
     });
-    return this.handleResponse(response);
+    return this.handleResponse<unknown[]>(response);
   }
 
-  async getActivityStats(): Promise<any> {
+  async getActivityStats(): Promise<unknown> {
     const response = await this.fetchWithTimeout(`${API_BASE_URL}/dashboard/activity/detail`, {
       headers: this.getAuthHeaders(),
     });
@@ -257,7 +283,7 @@ class APIService {
   // Health check
   async healthCheck() {
     const response = await this.fetchWithTimeout(`${API_BASE_URL}/health`,{});
-    return this.handleResponse(response);
+    return this.handleResponse<{ status: string }>(response);
   }
 }
 

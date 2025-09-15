@@ -1,6 +1,6 @@
 "use client"
 import type React from "react"
-import { redirect, useRouter } from "next/navigation"
+import { useRouter } from "next/navigation"
 
 import { Sidebar } from "@/components/dashboard/sidebar"
 import { useEffect, useState } from "react"
@@ -12,7 +12,8 @@ export default function DashboardLayout({
 }: {
   children: React.ReactNode
 }) {
-  const [user, setUser] = useState<any>(null)
+  type AuthUser = { id: number; fullName: string; email: string }
+  const [user, setUser] = useState<AuthUser | null>(null)
   const [loading, setLoading] = useState(true)
   const router = useRouter()
 
@@ -26,7 +27,7 @@ export default function DashboardLayout({
     }
 
     try {
-      const userData = JSON.parse(storedUser)
+      const userData: AuthUser = JSON.parse(storedUser)
       setUser(userData)
     } catch (error) {
       console.error("Error parsing user data:", error)

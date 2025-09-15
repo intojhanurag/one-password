@@ -18,8 +18,10 @@ const navigation = [
   { name: "Settings", href: "/dashboard/settings", icon: Settings },
 ]
 
+type User = { id: number; fullName: string; email: string } | null
+
 interface SidebarProps {
-  user: any
+  user: User
 }
 
 export function Sidebar({ user }: SidebarProps) {
@@ -100,7 +102,7 @@ export function Sidebar({ user }: SidebarProps) {
             <div className="flex items-center mb-3">
               <div className="bg-gradient-to-r from-blue-500 to-purple-600 rounded-full p-2">
                 <span className="text-sm font-medium text-white">
-                  {user?.fullName?.charAt(0)?.toUpperCase() || user?.email?.charAt(0)?.toUpperCase() || "U"}
+                  {(user?.fullName?.charAt(0) || user?.email?.charAt(0) || "U").toUpperCase()}
                 </span>
               </div>
               <div className="ml-3 flex-1 min-w-0">

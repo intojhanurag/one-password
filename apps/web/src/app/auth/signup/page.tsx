@@ -66,11 +66,11 @@ export default function SignUpPage() {
                         
                         // Store token and redirect to dashboard
                         localStorage.setItem("token", data.token);
-                        const { token, ...user } = data;
+                        const user = { id: data.id, fullName: data.fullName, email: data.email };
                         localStorage.setItem("user", JSON.stringify(user));
                         router.push("/dashboard");
-                    } catch (err: any) {
-                        setError(err.message || "Signup failed");
+                    } catch {
+                        setError("Signup failed");
                     } finally {
                         setIsLoading(false);
                     }

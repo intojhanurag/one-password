@@ -48,10 +48,39 @@ export default function ActivityPage() {
         apiService.listActivities(),
         apiService.getActivityStats()
       ])
-      setActivities(activitiesData || [])
-      setStats(statsData || null)
-    } catch (err: any) {
-      setError(err.message || "Failed to load activity data")
+      const isActivityItem = (value: unknown): value is ActivityItem => {
+        if (typeof value !== 'object' || value === null) return false
+        const v = value as Partial<ActivityItem>
+        return (
+          typeof v.id === 'number' &&
+          typeof v.userId === 'number' &&
+          typeof v.type === 'string' &&
+          typeof v.entity === 'string' &&
+          typeof v.entityId === 'number' &&
+          typeof v.message === 'string' &&
+          typeof v.createdAt === 'string'
+        )
+      }
+
+      const normalizedActivities: ActivityItem[] = Array.isArray(activitiesData)
+        ? (activitiesData.filter(isActivityItem) as ActivityItem[])
+        : []
+      setActivities(normalizedActivities)
+
+      const isActivityStats = (value: unknown): value is ActivityStats => {
+        if (typeof value !== 'object' || value === null) return false
+        const v = value as Partial<ActivityStats>
+        return (
+          typeof v.totalActivities === 'number' &&
+          typeof v.activitiesThisWeek === 'number' &&
+          typeof v.activitiesThisMonth === 'number' &&
+          typeof v.mostActiveDay === 'string' &&
+          typeof v.activityTypes === 'object' && v.activityTypes !== null
+        )
+      }
+      setStats(isActivityStats(statsData) ? (statsData as ActivityStats) : null)
+    } catch {
+      setError("Failed to load activity data")
     } finally {
       setLoading(false)
     }

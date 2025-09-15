@@ -4,10 +4,10 @@ import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
+
 import { Label } from "@/components/ui/label"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { Shield, KeyRound, Users, Eye, EyeOff, Trash2, AlertTriangle, CheckCircle } from "lucide-react"
+import { Shield, KeyRound, Users, Trash2, AlertTriangle, CheckCircle } from "lucide-react"
 import { apiService } from "@/lib/api"
 
 interface APIKey {
@@ -24,7 +24,7 @@ interface Team {
   id: number
   name: string
   description?: string
-  ownerId: number
+  ownerId?: number
   createdAt: string
 }
 
@@ -43,7 +43,7 @@ export default function SecurityPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [selectedTeam, setSelectedTeam] = useState<Team | null>(null)
-  const [selectedAPIKey, setSelectedAPIKey] = useState<APIKey | null>(null)
+
 
   useEffect(() => {
     const token = localStorage.getItem("token")
@@ -63,9 +63,9 @@ export default function SecurityPage() {
         apiService.getTeamsDashboard()
       ])
       setApiKeys(keysData || [])
-      setTeams(teamsData.teams || [])
-    } catch (err: any) {
-      setError(err.message || "Failed to load security data")
+      setTeams(teamsData.teamsOwned || [])
+    } catch{
+      setError("Failed to load security data")
     } finally {
       setLoading(false)
     }
@@ -75,8 +75,8 @@ export default function SecurityPage() {
     try {
       const teamKeys = await apiService.listAPIKeyTeams(teamId)
       setApiKeyTeams(teamKeys || [])
-    } catch (err: any) {
-      setError(err.message || "Failed to load team API keys")
+    } catch {
+      setError("Failed to load team API keys")
     }
   }
 
@@ -85,8 +85,8 @@ export default function SecurityPage() {
       setError(null)
       await apiService.attachAPIKeyToTeam({ teamId, apiKeyId })
       loadTeamAPIKeys(teamId)
-    } catch (err: any) {
-      setError(err.message || "Failed to attach API key to team")
+    } catch {
+      setError( "Failed to attach API key to team")
     }
   }
 
@@ -99,15 +99,14 @@ export default function SecurityPage() {
       setError(null)
       await apiService.detachAPIKeyFromTeam({ teamId, apiKeyId })
       loadTeamAPIKeys(teamId)
-    } catch (err: any) {
-      setError(err.message || "Failed to detach API key from team")
+    } catch  {
+      setError( "Failed to detach API key from team")
     }
   }
 
   const getSecurityScore = () => {
     const totalKeys = apiKeys.length
     const keysWithTeams = apiKeyTeams.length
-    const keysWithoutTeams = totalKeys - keysWithTeams
     
     if (totalKeys === 0) return 100
     

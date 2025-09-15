@@ -1,6 +1,6 @@
 "use client"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { KeyRound, Users, Shield, Activity, TrendingUp, Clock } from "lucide-react"
+import { KeyRound, Users, Shield, Activity, Clock } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 import { apiService } from "@/lib/api"
@@ -73,7 +73,7 @@ export default function DashboardPage() {
         <h1 className="text-3xl font-bold text-white">
           Welcome back 
         </h1>
-        <p className="text-slate-300 mt-2">Here's what's happening with your API keys and teams</p>
+        <p className="text-slate-300 mt-2">Here&rsquo;s what&rsquo;s happening with your API keys and teams</p>
       </div>
 
       {/* Stats Grid */}

@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { Settings, User, Shield, KeyRound, LogOut, Save, AlertTriangle } from "lucide-react"
+import { Settings, User, Shield, LogOut, Save, AlertTriangle } from "lucide-react"
 
 interface UserData {
   id: number
@@ -85,8 +85,8 @@ export default function SettingsPage() {
       localStorage.setItem("user", JSON.stringify(updatedUser))
       setUser(updatedUser)
       setSuccess("Profile updated successfully!")
-    } catch (err: any) {
-      setError(err.message || "Failed to update profile")
+    } catch  {
+      setError("Failed to update profile")
     } finally {
       setSaving(false)
     }
@@ -121,8 +121,8 @@ export default function SettingsPage() {
         confirmPassword: ""
       })
       setSuccess("Password changed successfully!")
-    } catch (err: any) {
-      setError(err.message || "Failed to change password")
+    } catch{
+      setError( "Failed to change password")
     } finally {
       setSaving(false)
     }

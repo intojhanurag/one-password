@@ -57,12 +57,12 @@ export default function LoginPage() {
                         
                         // Store token and user data
                         localStorage.setItem("token", data.token);
-                        const { token, ...user } = data;
+                        const user = { id: data.id, fullName: data.fullName, email: data.email };
                         localStorage.setItem("user", JSON.stringify(user));
                         
                         router.push("/dashboard");
-                    } catch (err: any) {
-                        setError(err.message || "Login failed");
+                    } catch{
+                        setError("Login failed");
                     } finally {
                         setIsLoading(false);
                     }
@@ -110,7 +110,7 @@ export default function LoginPage() {
             </form>
 
             <div className="mt-6 text-center text-sm">
-              <span className="text-slate-400">Don't have an account? </span>
+              <span className="text-slate-400">Do not have an account? </span>
               <Link href="/auth/signup" className="font-medium text-blue-400 hover:text-blue-300 transition-colors">
                 Sign up
               </Link>

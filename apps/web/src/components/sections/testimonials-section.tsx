@@ -61,7 +61,7 @@ export function TestimonialsSection() {
           </h2>
           
           <p className="text-xl text-slate-300 max-w-3xl mx-auto leading-relaxed">
-            Don't just take our word for it. See what industry leaders say about our platform.
+            Don&rsquo;t just take our word for it. See what industry leaders say about our platform.
           </p>
         </div>
 
@@ -117,7 +117,7 @@ export function TestimonialsSection() {
 
                   {/* Content */}
                   <blockquote className="text-slate-300 leading-relaxed text-lg group-hover:text-slate-200 transition-colors duration-300">
-                    "{testimonial.content}"
+                    &ldquo;{testimonial.content}&rdquo;
                   </blockquote>
 
                   {/* Author */}

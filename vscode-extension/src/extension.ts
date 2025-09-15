@@ -36,8 +36,8 @@ export function activate(context: vscode.ExtensionContext) {
 
 				await context.globalState.update('onePasswordToken',data.token);
 				vscode.window.showInformationMessage('Login successful!');
-			} catch(err:any){
-				vscode.window.showErrorMessage('Login failed: '+err.message)
+			} catch(err:unknown){
+				vscode.window.showErrorMessage('Login failed: ')
 			}
 		})
 	)
