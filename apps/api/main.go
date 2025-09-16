@@ -131,7 +131,7 @@ func main() {
 	mux.HandleFunc("/apikey-teams/delete", authMW(aktmHandler.Detach))
 
 	c := cors.New(cors.Options{
-		AllowedOrigins:   []string{"https://one-password-web.vercel.app"},
+		AllowedOrigins:   []string{"*"},
 		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		AllowedHeaders:   []string{"Authorization", "Content-Type", "Accept", "Origin", "X-Requested-With"},
 		AllowCredentials: true,
