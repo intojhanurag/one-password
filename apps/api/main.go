@@ -133,7 +133,7 @@ func main() {
 
 
 	c := cors.New(cors.Options{
-		AllowedOrigins:   []string{"http://localhost:3000"}, // change to your frontend URL
+		AllowedOrigins:   []string{"https://one-password-web.vercel.app"}, // change to your frontend URL
 		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		AllowedHeaders:   []string{"Authorization", "Content-Type"},
 		AllowCredentials: true,
