@@ -109,7 +109,7 @@ class APIService {
 
   // Auth endpoints
   async signup(data: { fullName: string; email: string; password: string }): Promise<SignupResponse> {
-    const response = await this.fetchWithTimeout("/auth/signup", {
+    const response = await this.fetchWithTimeout("/api/auth/signup", {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data),
@@ -118,7 +118,7 @@ class APIService {
   }
 
   async login(data: { email: string; password: string }): Promise<LoginResponse> {
-    const response = await this.fetchWithTimeout("/auth/login", {
+    const response = await this.fetchWithTimeout("/api/auth/login", {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data),
@@ -135,7 +135,7 @@ class APIService {
     recentApiKeys: APIKey[];
     recentlyUsedKeys: APIKey[];
   }> {
-    const response = await this.fetchWithTimeout("/dashboard", {
+    const response = await this.fetchWithTimeout("/api/dashboard", {
       headers: this.getAuthHeaders(),
     });
     return this.handleResponse<{
@@ -155,7 +155,7 @@ class APIService {
     sharedKeys: number;
     teamsOwned: Array<{ id: number; name: string; description?: string; createdAt: string }>;
   }> {
-    const response = await this.fetchWithTimeout("/dashboard/teams", {
+    const response = await this.fetchWithTimeout("/api/dashboard/teams", {
       headers: this.getAuthHeaders(),
     });
     return this.handleResponse<{
@@ -169,7 +169,7 @@ class APIService {
 
   // API Keys endpoints
   async createAPIKey(data: { name: string; key: string; description?: string; tags?: string }) {
-    const response = await this.fetchWithTimeout("/apikeys", {
+    const response = await this.fetchWithTimeout("/api/apikeys", {
       method: 'POST',
       headers: this.getAuthHeaders(),
       body: JSON.stringify(data),
@@ -178,14 +178,14 @@ class APIService {
   }
 
   async listAPIKeys(): Promise<APIKey[]> {
-    const response = await this.fetchWithTimeout("/apikeys/list", {
+    const response = await this.fetchWithTimeout("/api/apikeys/list", {
       headers: this.getAuthHeaders(),
     });
     return this.handleResponse<APIKey[]>(response);
   }
 
   async revealAPIKey(name: string) {
-    const response = await this.fetchWithTimeout("/apikeys/reveal", {
+    const response = await this.fetchWithTimeout("/api/apikeys/reveal", {
       method: 'POST',
       headers: this.getAuthHeaders(),
       body: JSON.stringify({ name }),
@@ -194,7 +194,7 @@ class APIService {
   }
 
   async deleteAPIKey(name: string) {
-    const response = await this.fetchWithTimeout("/apikeys/delete", {
+    const response = await this.fetchWithTimeout("/api/apikeys/delete", {
       method: 'DELETE',
       headers: this.getAuthHeaders(),
       body: JSON.stringify({ name }),
@@ -204,7 +204,7 @@ class APIService {
 
   // Teams endpoints
   async createTeam(data: { name: string; description?: string }) {
-    const response = await this.fetchWithTimeout("/teams", {
+    const response = await this.fetchWithTimeout("/api/teams", {
       method: 'POST',
       headers: this.getAuthHeaders(),
       body: JSON.stringify(data),
@@ -214,7 +214,7 @@ class APIService {
 
   // Team Memberships endpoints
   async createTeamMembership(data: { teamId: number; userId: number }) {
-    const response = await this.fetchWithTimeout("/team-memberships", {
+    const response = await this.fetchWithTimeout("/api/team-memberships", {
       method: 'POST',
       headers: this.getAuthHeaders(),
       body: JSON.stringify(data),
@@ -223,14 +223,14 @@ class APIService {
   }
 
   async listTeamMemberships(): Promise<TeamMembership[]> {
-    const response = await this.fetchWithTimeout("/team-memberships/list", {
+    const response = await this.fetchWithTimeout("/api/team-memberships/list", {
       headers: this.getAuthHeaders(),
     });
     return this.handleResponse<TeamMembership[]>(response);
   }
 
   async deleteTeamMembership(data: { teamId: number; userId: number }) {
-    const response = await this.fetchWithTimeout("/team-memberships/delete", {
+    const response = await this.fetchWithTimeout("/api/team-memberships/delete", {
       method: 'DELETE',
       headers: this.getAuthHeaders(),
       body: JSON.stringify(data),
@@ -240,7 +240,7 @@ class APIService {
 
   // API Key-Team relationship endpoints
   async attachAPIKeyToTeam(data: { teamId: number; apiKeyId: number }) {
-    const response = await this.fetchWithTimeout("/apikey-teams", {
+    const response = await this.fetchWithTimeout("/api/apikey-teams", {
       method: 'POST',
       headers: this.getAuthHeaders(),
       body: JSON.stringify(data),
@@ -249,14 +249,14 @@ class APIService {
   }
 
   async listAPIKeyTeams(teamId: number): Promise<APIKeyTeam[]> {
-    const response = await this.fetchWithTimeout("/apikey-teams/list?team_id=${teamId}", {
+    const response = await this.fetchWithTimeout(`/api/apikey-teams/list?team_id=${teamId}`, {
       headers: this.getAuthHeaders(),
     });
     return this.handleResponse<APIKeyTeam[]>(response);
   }
 
   async detachAPIKeyFromTeam(data: { teamId: number; apiKeyId: number }) {
-    const response = await this.fetchWithTimeout("/apikey-teams/delete", {
+    const response = await this.fetchWithTimeout("/api/apikey-teams/delete", {
       method: 'DELETE',
       headers: this.getAuthHeaders(),
       body: JSON.stringify(data),
@@ -266,14 +266,14 @@ class APIService {
 
   // Activity endpoints
   async listActivities(): Promise<unknown[]> {
-    const response = await this.fetchWithTimeout("/dashboard/activity", {
+    const response = await this.fetchWithTimeout("/api/dashboard/activity", {
       headers: this.getAuthHeaders(),
     });
     return this.handleResponse<unknown[]>(response);
   }
 
   async getActivityStats(): Promise<unknown> {
-    const response = await this.fetchWithTimeout("/dashboard/activity/detail", {
+    const response = await this.fetchWithTimeout("/api/dashboard/activity/detail", {
       headers: this.getAuthHeaders(),
     });
     return this.handleResponse(response);
@@ -281,7 +281,7 @@ class APIService {
 
   // Health check
   async healthCheck() {
-    const response = await this.fetchWithTimeout("/health",{});
+    const response = await this.fetchWithTimeout("/api/health",{});
     return this.handleResponse<{ status: string }>(response);
   }
 }
