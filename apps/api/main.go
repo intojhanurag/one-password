@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
+	"strings"
 
 	"github.com/intojhanurag/One-Password/apps/api/internals/config"
 	"github.com/intojhanurag/One-Password/apps/api/internals/database"
@@ -79,7 +81,6 @@ func main() {
 
 	
 
-
 	
 	authMW := middleware.AuthMW([]byte(cfg.JWTSecret))
 
@@ -132,8 +133,20 @@ func main() {
 	mux.HandleFunc("/apikey-teams/delete", authMW(aktmHandler.Detach))
 
 
+	// Configure CORS via env FRONTEND_ORIGINS (comma-separated)
+	originsEnv := os.Getenv("FRONTEND_ORIGINS")
+	var allowedOrigins []string
+	if originsEnv != "" {
+		for _, o := range strings.Split(originsEnv, ",") {
+			o = strings.TrimSpace(o)
+			if o != "" { allowedOrigins = append(allowedOrigins, o) }
+		}
+	} else {
+		allowedOrigins = []string{"*"}
+	}
+
 	c := cors.New(cors.Options{
-		AllowedOrigins:   []string{"https://one-password-web.vercel.app"}, // change to your frontend URL
+		AllowedOrigins:   allowedOrigins,
 		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		AllowedHeaders:   []string{"Authorization", "Content-Type"},
 		AllowCredentials: true,
