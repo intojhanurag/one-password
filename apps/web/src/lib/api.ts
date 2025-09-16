@@ -1,4 +1,4 @@
-const API_BASE_URL = 'http://localhost:5000';
+const API_BASE_URL = 'https://one-password-api-latest.onrender.com';
 const REQUEST_TIMEOUT = 10000; // 10 seconds
 
 export interface APIResponse<T = unknown> {

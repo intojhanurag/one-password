@@ -17,18 +17,9 @@ export function HeroSection() {
             <span className="text-2xl font-bold text-white">One-Password</span>
           </div>
 
-          {/* Navigation */}
-          <nav className="hidden md:flex items-center space-x-8">
-            <a href="#pricing" className="text-slate-300 hover:text-white transition-colors">Pricing</a>
-            <a href="#demo" className="text-slate-300 hover:text-white transition-colors">Demo</a>
-            <a href="#testimonials" className="text-slate-300 hover:text-white transition-colors">Wall of Love</a>
-          </nav>
-
           {/* CTA Buttons */}
           <div className="flex items-center space-x-4">
-            <button className="text-yellow-400 text-sm font-medium hover:text-yellow-300 transition-colors">
-              Press L to see the Leaderboards
-            </button>
+  
             <a href="/auth/login" className="text-slate-300 hover:text-white transition-colors text-sm font-medium">
               Sign In
             </a>

@@ -26,7 +26,7 @@ export function PremiumCard({
     !glass && !gradient && "bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm"
   )
 
-  const hoverClasses = hover ? "hover:bg-white dark:hover:bg-slate-800 hover:border-slate-300 dark:hover:border-slate-600 hover:shadow-xl hover:shadow-blue-500/10" : ""
+  const hoverClasses = hover ? "dark:hover:bg-slate-800 hover:border-slate-300 dark:hover:border-slate-600 hover:shadow-xl hover:shadow-blue-500/10" : ""
 
   if (hover) {
     return (
