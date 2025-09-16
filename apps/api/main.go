@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"strings"
 
 	"github.com/intojhanurag/One-Password/apps/api/internals/config"
 	"github.com/intojhanurag/One-Password/apps/api/internals/database"
@@ -135,7 +134,7 @@ func main() {
 		AllowedOrigins:   []string{"https://one-password-web.vercel.app"},
 		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		AllowedHeaders:   []string{"Authorization", "Content-Type", "Accept", "Origin", "X-Requested-With"},
-		AllowCredentials: allowCreds,
+		AllowCredentials: true,
 	})
 
 	addr := ":" + cfg.Port
