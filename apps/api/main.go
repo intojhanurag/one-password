@@ -132,24 +132,11 @@ func main() {
 	mux.HandleFunc("/apikey-teams/list", authMW(aktmHandler.List))
 	mux.HandleFunc("/apikey-teams/delete", authMW(aktmHandler.Detach))
 
-
-	// Configure CORS via env FRONTEND_ORIGINS (comma-separated)
-	originsEnv := os.Getenv("FRONTEND_ORIGINS")
-	var allowedOrigins []string
-	if originsEnv != "" {
-		for _, o := range strings.Split(originsEnv, ",") {
-			o = strings.TrimSpace(o)
-			if o != "" { allowedOrigins = append(allowedOrigins, o) }
-		}
-	} else {
-		allowedOrigins = []string{"*"}
-	}
-
 	c := cors.New(cors.Options{
-		AllowedOrigins:   allowedOrigins,
+		AllowedOrigins:   []string{"https://one-password-web.vercel.app"},
 		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
-		AllowedHeaders:   []string{"Authorization", "Content-Type"},
-		AllowCredentials: true,
+		AllowedHeaders:   []string{"Authorization", "Content-Type", "Accept", "Origin", "X-Requested-With"},
+		AllowCredentials: allowCreds,
 	})
 
 
