@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"os"
 	"strings"
 
 	"github.com/intojhanurag/One-Password/apps/api/internals/config"
@@ -138,7 +137,6 @@ func main() {
 		AllowedHeaders:   []string{"Authorization", "Content-Type", "Accept", "Origin", "X-Requested-With"},
 		AllowCredentials: allowCreds,
 	})
-
 
 	addr := ":" + cfg.Port
 	fmt.Println("Starting server at", addr)
