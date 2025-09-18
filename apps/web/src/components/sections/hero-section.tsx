@@ -7,20 +7,19 @@ export function HeroSection() {
   return (
     <div className="min-h-screen bg-slate-900 relative overflow-hidden">
       {/* Header */}
-      <header className="relative z-20 px-6 py-4">
+      <header className="relative z-20 px-4 sm:px-6 py-4">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           {/* Logo */}
           <div className="flex items-center space-x-2">
             <div className="bg-gradient-to-r from-yellow-400 to-yellow-500 p-2 rounded-lg">
               <KeyRound className="h-6 w-6 text-black" />
             </div>
-            <span className="text-2xl font-bold text-white">One-Password</span>
+            <span className="text-xl sm:text-2xl font-bold text-white">One-Password</span>
           </div>
 
           {/* CTA Buttons */}
-          <div className="flex items-center space-x-4">
-  
-            <a href="/auth/login" className="text-slate-300 hover:text-white transition-colors text-sm font-medium">
+          <div className="flex items-center space-x-2 sm:space-x-4">
+            <a href="/auth/login" className="text-slate-300 hover:text-white transition-colors text-sm font-medium hidden sm:block">
               Sign In
             </a>
             <PremiumButton size="sm" href="/auth/signup">
@@ -31,7 +30,7 @@ export function HeroSection() {
       </header>
 
       {/* Main Content */}
-      <div className="relative z-10 max-w-7xl mx-auto px-6 py-12">
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 py-12">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           {/* Left Side - Main Content */}
           <div className="space-y-8">
@@ -94,143 +93,180 @@ export function HeroSection() {
 
           {/* Right Side - Technology Showcase */}
           <div className="relative">
-            {/* Central Node */}
-            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10">
-              <div className="w-20 h-20 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center shadow-2xl">
-                <KeyRound className="h-10 w-10 text-white" />
+            {/* Mobile: Show central node and simple list */}
+            <div className="block lg:hidden">
+              <div className="text-center mb-8">
+                <div className="w-20 h-20 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center shadow-2xl mx-auto mb-6">
+                  <KeyRound className="h-10 w-10 text-white" />
+                </div>
+                <p className="text-slate-400 text-sm">Built with modern technologies</p>
+              </div>
+
+              {/* Simple grid for mobile */}
+              <div className="grid grid-cols-3 gap-3">
+                {[
+                  { name: "Next.js", icon: "N", color: "bg-black", text: "text-white" },
+                  { name: "Tailwind", icon: "T", color: "bg-cyan-500", text: "text-white" },
+                  { name: "Stripe", icon: "S", color: "bg-purple-600", text: "text-white" },
+                  { name: "NextAuth", icon: Shield, color: "bg-gradient-to-r from-blue-500 to-purple-600", text: "text-white" },
+                  { name: "PostgreSQL", icon: "P", color: "bg-green-500", text: "text-white" },
+                  { name: "Go", icon: "G", color: "bg-cyan-400", text: "text-black" },
+                  { name: "AES-256", icon: Lock, color: "bg-red-500", text: "text-white" }
+                ].map((tech) => (
+                  <div key={tech.name} className="bg-slate-800 border border-slate-700 rounded-xl p-3 shadow-xl text-center">
+                    <div className={`w-8 h-8 ${tech.color} rounded flex items-center justify-center mx-auto mb-2`}>
+                      {typeof tech.icon === 'string' ? (
+                        <span className={`text-sm font-bold ${tech.text}`}>{tech.icon}</span>
+                      ) : (
+                        <tech.icon className="h-4 w-4 text-white" />
+                      )}
+                    </div>
+                    <span className="text-white font-semibold text-sm">{tech.name}</span>
+                  </div>
+                ))}
               </div>
             </div>
 
-            {/* Technology Nodes */}
-            <div className="relative h-96">
-              {/* Next.js - Top */}
-              <div className="absolute top-0 left-1/2 transform -translate-x-1/2">
-                <div className="bg-slate-800 border border-slate-700 rounded-xl p-4 shadow-xl">
-                  <div className="flex items-center space-x-2 mb-2">
-                    <div className="w-6 h-6 bg-black rounded text-white flex items-center justify-center text-xs font-bold">N</div>
-                    <span className="text-white font-semibold">Next.js</span>
-                  </div>
-                  <div className="text-xs text-slate-400 space-y-1">
-                    <div>App Router</div>
-                    <div>Server Components</div>
-                  </div>
+            {/* Desktop: Original absolute positioned showcase */}
+            <div className="hidden lg:block">
+              {/* Central Node */}
+              <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10">
+                <div className="w-20 h-20 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center shadow-2xl">
+                  <KeyRound className="h-10 w-10 text-white" />
                 </div>
               </div>
 
-              {/* Tailwind - Top Right */}
-              <div className="absolute top-8 right-8">
-                <div className="bg-slate-800 border border-slate-700 rounded-xl p-4 shadow-xl">
-                  <div className="flex items-center space-x-2 mb-2">
-                    <div className="w-6 h-6 bg-cyan-500 rounded flex items-center justify-center">
-                      <span className="text-xs font-bold text-white">T</span>
+              {/* Technology Nodes */}
+              <div className="relative h-96">
+                {/* Next.js - Top */}
+                <div className="absolute top-0 left-1/2 transform -translate-x-1/2">
+                  <div className="bg-slate-800 border border-slate-700 rounded-xl p-4 shadow-xl">
+                    <div className="flex items-center space-x-2 mb-2">
+                      <div className="w-6 h-6 bg-black rounded text-white flex items-center justify-center text-xs font-bold">N</div>
+                      <span className="text-white font-semibold">Next.js</span>
                     </div>
-                    <span className="text-white font-semibold">Tailwind</span>
-                  </div>
-                  <div className="text-xs text-slate-400 space-y-1">
-                    <div>Components</div>
-                    <div>Animations</div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Stripe - Right */}
-              <div className="absolute top-1/2 right-0 transform -translate-y-1/2">
-                <div className="bg-slate-800 border border-slate-700 rounded-xl p-4 shadow-xl">
-                  <div className="flex items-center space-x-2 mb-2">
-                    <div className="w-6 h-6 bg-purple-600 rounded flex items-center justify-center">
-                      <span className="text-xs font-bold text-white">S</span>
+                    <div className="text-xs text-slate-400 space-y-1">
+                      <div>App Router</div>
+                      <div>Server Components</div>
                     </div>
-                    <span className="text-white font-semibold">Stripe</span>
-                  </div>
-                  <div className="text-xs text-slate-400 space-y-1">
-                    <div>Webhooks</div>
-                    <div>Checkout</div>
                   </div>
                 </div>
-              </div>
 
-              {/* Auth - Bottom Right */}
-              <div className="absolute bottom-8 right-8">
-                <div className="bg-slate-800 border border-slate-700 rounded-xl p-4 shadow-xl">
-                  <div className="flex items-center space-x-2 mb-2">
-                    <div className="w-6 h-6 bg-gradient-to-r from-blue-500 to-purple-600 rounded flex items-center justify-center">
-                      <Shield className="h-3 w-3 text-white" />
+                {/* Tailwind - Top Right */}
+                <div className="absolute top-8 right-8">
+                  <div className="bg-slate-800 border border-slate-700 rounded-xl p-4 shadow-xl">
+                    <div className="flex items-center space-x-2 mb-2">
+                      <div className="w-6 h-6 bg-cyan-500 rounded flex items-center justify-center">
+                        <span className="text-xs font-bold text-white">T</span>
+                      </div>
+                      <span className="text-white font-semibold">Tailwind</span>
                     </div>
-                    <span className="text-white font-semibold">NextAuth</span>
-                  </div>
-                  <div className="text-xs text-slate-400 space-y-1">
-                    <div>Google Login</div>
-                    <div>Magic Link</div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Database - Bottom */}
-              <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2">
-                <div className="bg-slate-800 border border-slate-700 rounded-xl p-4 shadow-xl">
-                  <div className="flex items-center space-x-2 mb-2">
-                    <div className="w-6 h-6 bg-green-500 rounded flex items-center justify-center">
-                      <span className="text-xs font-bold text-white">P</span>
+                    <div className="text-xs text-slate-400 space-y-1">
+                      <div>Components</div>
+                      <div>Animations</div>
                     </div>
-                    <span className="text-white font-semibold">PostgreSQL</span>
-                  </div>
-                  <div className="text-xs text-slate-400 space-y-1">
-                    <div>Encryption</div>
-                    <div>Backups</div>
                   </div>
                 </div>
-              </div>
 
-              {/* Go Backend - Left */}
-              <div className="absolute top-1/2 left-0 transform -translate-y-1/2">
-                <div className="bg-slate-800 border border-slate-700 rounded-xl p-4 shadow-xl">
-                  <div className="flex items-center space-x-2 mb-2">
-                    <div className="w-6 h-6 bg-cyan-400 rounded flex items-center justify-center">
-                      <span className="text-xs font-bold text-black">G</span>
+                {/* Stripe - Right */}
+                <div className="absolute top-1/2 right-0 transform -translate-y-1/2">
+                  <div className="bg-slate-800 border border-slate-700 rounded-xl p-4 shadow-xl">
+                    <div className="flex items-center space-x-2 mb-2">
+                      <div className="w-6 h-6 bg-purple-600 rounded flex items-center justify-center">
+                        <span className="text-xs font-bold text-white">S</span>
+                      </div>
+                      <span className="text-white font-semibold">Stripe</span>
                     </div>
-                    <span className="text-white font-semibold">Go</span>
-                  </div>
-                  <div className="text-xs text-slate-400 space-y-1">
-                    <div>High Performance</div>
-                    <div>Concurrency</div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Security - Top Left */}
-              <div className="absolute top-8 left-8">
-                <div className="bg-slate-800 border border-slate-700 rounded-xl p-4 shadow-xl">
-                  <div className="flex items-center space-x-2 mb-2">
-                    <div className="w-6 h-6 bg-red-500 rounded flex items-center justify-center">
-                      <Lock className="h-3 w-3 text-white" />
+                    <div className="text-xs text-slate-400 space-y-1">
+                      <div>Webhooks</div>
+                      <div>Checkout</div>
                     </div>
-                    <span className="text-white font-semibold">AES-256</span>
-                  </div>
-                  <div className="text-xs text-slate-400 space-y-1">
-                    <div>Encryption</div>
-                    <div>Zero Trust</div>
                   </div>
                 </div>
-              </div>
 
-              {/* Connecting Lines */}
-              <svg className="absolute inset-0 w-full h-full pointer-events-none">
-                <defs>
-                  <linearGradient id="lineGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stopColor="#3b82f6" />
-                    <stop offset="100%" stopColor="#8b5cf6" />
-                  </linearGradient>
-                </defs>
-                {/* Lines connecting to center */}
-                <line x1="50%" y1="0%" x2="50%" y2="50%" stroke="url(#lineGradient)" strokeWidth="2" opacity="0.3" />
-                <line x1="50%" y1="50%" x2="100%" y2="50%" stroke="url(#lineGradient)" strokeWidth="2" opacity="0.3" />
-                <line x1="50%" y1="50%" x2="0%" y2="50%" stroke="url(#lineGradient)" strokeWidth="2" opacity="0.3" />
-                <line x1="50%" y1="50%" x2="50%" y2="100%" stroke="url(#lineGradient)" strokeWidth="2" opacity="0.3" />
-                <line x1="50%" y1="50%" x2="80%" y2="20%" stroke="url(#lineGradient)" strokeWidth="2" opacity="0.3" />
-                <line x1="50%" y1="50%" x2="20%" y2="20%" stroke="url(#lineGradient)" strokeWidth="2" opacity="0.3" />
-                <line x1="50%" y1="50%" x2="80%" y2="80%" stroke="url(#lineGradient)" strokeWidth="2" opacity="0.3" />
-                <line x1="50%" y1="50%" x2="20%" y2="80%" stroke="url(#lineGradient)" strokeWidth="2" opacity="0.3" />
-              </svg>
+                {/* Auth - Bottom Right */}
+                <div className="absolute bottom-8 right-8">
+                  <div className="bg-slate-800 border border-slate-700 rounded-xl p-4 shadow-xl">
+                    <div className="flex items-center space-x-2 mb-2">
+                      <div className="w-6 h-6 bg-gradient-to-r from-blue-500 to-purple-600 rounded flex items-center justify-center">
+                        <Shield className="h-3 w-3 text-white" />
+                      </div>
+                      <span className="text-white font-semibold">NextAuth</span>
+                    </div>
+                    <div className="text-xs text-slate-400 space-y-1">
+                      <div>Google Login</div>
+                      <div>Magic Link</div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Database - Bottom */}
+                <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2">
+                  <div className="bg-slate-800 border border-slate-700 rounded-xl p-4 shadow-xl">
+                    <div className="flex items-center space-x-2 mb-2">
+                      <div className="w-6 h-6 bg-green-500 rounded flex items-center justify-center">
+                        <span className="text-xs font-bold text-white">P</span>
+                      </div>
+                      <span className="text-white font-semibold">PostgreSQL</span>
+                    </div>
+                    <div className="text-xs text-slate-400 space-y-1">
+                      <div>Encryption</div>
+                      <div>Backups</div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Go Backend - Left */}
+                <div className="absolute top-1/2 left-0 transform -translate-y-1/2">
+                  <div className="bg-slate-800 border border-slate-700 rounded-xl p-4 shadow-xl">
+                    <div className="flex items-center space-x-2 mb-2">
+                      <div className="w-6 h-6 bg-cyan-400 rounded flex items-center justify-center">
+                        <span className="text-xs font-bold text-black">G</span>
+                      </div>
+                      <span className="text-white font-semibold">Go</span>
+                    </div>
+                    <div className="text-xs text-slate-400 space-y-1">
+                      <div>High Performance</div>
+                      <div>Concurrency</div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Security - Top Left */}
+                <div className="absolute top-8 left-8">
+                  <div className="bg-slate-800 border border-slate-700 rounded-xl p-4 shadow-xl">
+                    <div className="flex items-center space-x-2 mb-2">
+                      <div className="w-6 h-6 bg-red-500 rounded flex items-center justify-center">
+                        <Lock className="h-3 w-3 text-white" />
+                      </div>
+                      <span className="text-white font-semibold">AES-256</span>
+                    </div>
+                    <div className="text-xs text-slate-400 space-y-1">
+                      <div>Encryption</div>
+                      <div>Zero Trust</div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Connecting Lines */}
+                <svg className="absolute inset-0 w-full h-full pointer-events-none">
+                  <defs>
+                    <linearGradient id="lineGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" stopColor="#3b82f6" />
+                      <stop offset="100%" stopColor="#8b5cf6" />
+                    </linearGradient>
+                  </defs>
+                  {/* Lines connecting to center */}
+                  <line x1="50%" y1="0%" x2="50%" y2="50%" stroke="url(#lineGradient)" strokeWidth="2" opacity="0.3" />
+                  <line x1="50%" y1="50%" x2="100%" y2="50%" stroke="url(#lineGradient)" strokeWidth="2" opacity="0.3" />
+                  <line x1="50%" y1="50%" x2="0%" y2="50%" stroke="url(#lineGradient)" strokeWidth="2" opacity="0.3" />
+                  <line x1="50%" y1="50%" x2="50%" y2="100%" stroke="url(#lineGradient)" strokeWidth="2" opacity="0.3" />
+                  <line x1="50%" y1="50%" x2="80%" y2="20%" stroke="url(#lineGradient)" strokeWidth="2" opacity="0.3" />
+                  <line x1="50%" y1="50%" x2="20%" y2="20%" stroke="url(#lineGradient)" strokeWidth="2" opacity="0.3" />
+                  <line x1="50%" y1="50%" x2="80%" y2="80%" stroke="url(#lineGradient)" strokeWidth="2" opacity="0.3" />
+                  <line x1="50%" y1="50%" x2="20%" y2="80%" stroke="url(#lineGradient)" strokeWidth="2" opacity="0.3" />
+                </svg>
+              </div>
             </div>
 
             {/* Bottom Text */}
