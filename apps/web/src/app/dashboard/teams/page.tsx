@@ -43,10 +43,8 @@ export default function TeamsPage() {
     description: ""
   })
 
-  // Team membership form state
-  const [membershipForm, setMembershipForm] = useState({
-    userId: ""
-  })
+  // Team membership form state - now team-specific
+  const [membershipForms, setMembershipForms] = useState<{ [teamId: number]: { userId: string } }>({})
 
   useEffect(() => {
     const token = localStorage.getItem("token")
@@ -109,20 +107,22 @@ export default function TeamsPage() {
     }
   }
 
-  const handleAddMember = async (e: React.FormEvent) => {
+  const handleAddMember = async (e: React.FormEvent, teamId: number) => {
     e.preventDefault()
-    if (!selectedTeam) return
+
+    const currentForm = membershipForms[teamId]
+    if (!currentForm?.userId) return
 
     try {
       setError(null)
       await apiService.createTeamMembership({
-        teamId: selectedTeam.id,
-        userId: parseInt(membershipForm.userId)
+        teamId: teamId,
+        userId: parseInt(currentForm.userId)
       })
-      setMembershipForm({ userId: "" })
+      setMembershipForms(prev => ({ ...prev, [teamId]: { userId: "" } }))
       loadTeamsData()
     } catch {
-      setError( "Failed to add team member")
+      setError("Failed to add team member")
     }
   }
 
@@ -317,12 +317,15 @@ export default function TeamsPage() {
                       <h4 className="font-medium text-white mb-2">
                         Add Team Member
                       </h4>
-                      <form onSubmit={handleAddMember} className="flex space-x-2">
+                      <form onSubmit={(e) => handleAddMember(e, team.id)} className="flex space-x-2">
                         <Input
                           type="number"
                           placeholder="User ID"
-                          value={membershipForm.userId}
-                          onChange={(e) => setMembershipForm({ userId: e.target.value })}
+                          value={membershipForms[team.id]?.userId || ""}
+                          onChange={(e) => setMembershipForms(prev => ({ 
+                            ...prev, 
+                            [team.id]: { userId: e.target.value } 
+                          }))}
                           className="flex-1 bg-slate-700 border-slate-600 text-white placeholder-slate-400 focus:border-blue-500"
                         />
                         <Button 

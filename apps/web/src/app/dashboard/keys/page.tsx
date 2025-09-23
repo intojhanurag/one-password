@@ -411,10 +411,49 @@ export default function APIKeysPage() {
                   </div>
                 </div>
                 {revealedKeys[apiKey.name] && (
-                  <div className="mt-4 p-3 bg-slate-700 rounded-lg">
-                    <p className="text-sm font-mono break-all text-white">
-                      {revealedKeys[apiKey.name]}
-                    </p>
+                  <div className="mt-4 space-y-3">
+                    {/* API Key Value Card */}
+                    <div className="p-4 bg-slate-700 rounded-lg border border-slate-600">
+                      <div className="flex items-center justify-between mb-2">
+                        <h4 className="text-sm font-medium text-slate-300">API Key Value</h4>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleCopyKey(revealedKeys[apiKey.name], apiKey.name)}
+                          className="h-6 px-2 text-xs"
+                        >
+                          {copiedKeys[apiKey.name] ? "Copied!" : "Copy"}
+                        </Button>
+                      </div>
+                      <p className="text-sm font-mono break-all text-white bg-slate-800 p-2 rounded border">
+                        {revealedKeys[apiKey.name]}
+                      </p>
+                    </div>
+                    
+                    {/* API Key Details Card */}
+                    <div className="p-4 bg-slate-700 rounded-lg border border-slate-600">
+                      <h4 className="text-sm font-medium text-slate-300 mb-3">API Key Details</h4>
+                      <div className="bg-slate-800 p-3 rounded border font-mono text-sm">
+                        <pre className="text-green-400 whitespace-pre-wrap overflow-x-auto">
+{JSON.stringify({
+  id: apiKey.id,
+  name: apiKey.name,
+  description: apiKey.description || null,
+  tags: apiKey.tags ? apiKey.tags.split(',').map(tag => tag.trim()) : [],
+  ownerId: apiKey.ownerId,
+  createdAt: apiKey.createdAt,
+  updatedAt: apiKey.updatedAt,
+  keyValue: revealedKeys[apiKey.name],
+  metadata: {
+    keyLength: revealedKeys[apiKey.name].length,
+    hasDescription: !!apiKey.description,
+    hasTags: !!apiKey.tags,
+    daysSinceCreated: Math.floor((new Date().getTime() - new Date(apiKey.createdAt).getTime()) / (1000 * 60 * 60 * 24))
+  }
+}, null, 2)}
+                        </pre>
+                      </div>
+                    </div>
                   </div>
                 )}
               </CardContent>
