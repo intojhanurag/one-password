@@ -81,6 +81,20 @@ func (h *AuthHandler) Signin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	
+	redirectURL := r.URL.Query().Get("redirect")
+
+	if redirectURL != "" {
+		
+		if strings.HasPrefix(redirectURL, "http://localhost:54321") {
+			target := fmt.Sprintf("%s/%s", redirectURL, res.Token)
+			http.Redirect(w, r, target, http.StatusFound)
+			return
+		}
+	}
+
+	
+	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(map[string]interface{}{
 		"id":       res.User.ID,
 		"fullName": res.User.FullName,
